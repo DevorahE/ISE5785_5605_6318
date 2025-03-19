@@ -20,9 +20,9 @@ public class Point {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Point point = (Point) o;
-        return Objects.equals(xyz, point.xyz);
+        if (this == o) return true;
+        return (o instanceof Point other)
+                && this.xyz.equals(other.xyz);
     }
 
     @Override
