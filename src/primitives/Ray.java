@@ -3,8 +3,8 @@ package primitives;
 import java.util.Objects;
 
 public class Ray {
-    public final Point head;
-    public final Vector direction;
+    private final Point head;
+    private final Vector direction;
 
     public Ray(Point head, Vector direction)
     {
