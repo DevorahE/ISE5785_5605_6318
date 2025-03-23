@@ -2,13 +2,13 @@ package primitives;
 
 public class Vector extends Point{
 
-    public Vector(double x, double y, double z){
+    public Vector(double x, double y, double z) throws IllegalArgumentException{
         super(x,y,z);
         if(this.equals(ZERO))
             throw new IllegalArgumentException("The vector is ZERO!");
     }
 
-    public Vector(Double3 xyz)
+    public Vector(Double3 xyz) throws IllegalArgumentException
     {
         super(xyz);
         if(this.equals(ZERO))
@@ -17,44 +17,41 @@ public class Vector extends Point{
 
     public Vector add(Vector vector)
     {
-        //TODO
-        return new Vector(0,0,0);
+        return new Vector(this.xyz.add(vector.xyz));
     }
 
     public Vector scale(double d)
     {
-        //TODO
-        return new Vector(0,0,0);
+        return new Vector(this.xyz.scale(d));
     }
 
-    public Vector dotProduct(Vector vector)
+    public double dotProduct(Vector vector)
     {
-        //TODO
-        return new Vector(0,0,0);
+        return this.xyz.d1() * vector.xyz.d1() + this.xyz.d2() * vector.xyz.d2() + this.xyz.d3() * vector.xyz.d3();
     }
 
     public Vector crossProduct(Vector vector)
     {
-        //TODO
-        return new Vector(0,0,0);
+        return new Vector(
+                this.xyz.d2() * vector.xyz.d3() - this.xyz.d3() * vector.xyz.d2(),
+                this.xyz.d3() * vector.xyz.d1() - this.xyz.d1() * vector.xyz.d3(),
+                this.xyz.d1() * vector.xyz.d2() - this.xyz.d2() * vector.xyz.d1()
+        );
     }
 
     public double lengthSquared()
     {
-        //TODO
-        return 0;
+        return xyz.d1() * xyz.d1() + xyz.d2() * xyz.d2() + xyz.d3()* xyz.d3();
     }
 
     public double length()
     {
-        //TODO
-        return 0;
+        return Math.sqrt(lengthSquared());
     }
 
     public Vector normalize()
     {
-        //TODO
-        return new Vector(0,0,0);
+        return new Vector(xyz.reduce(this.length()));
     }
 
     @Override
