@@ -1,7 +1,6 @@
 package primitives;
 
 import java.util.Objects;
-import java.util.Vector;
 
 public class Point {
 
@@ -32,28 +31,28 @@ public class Point {
                 '}';
     }
 
-    public Vector subtract(Point point)
+    public primitives.Vector subtract(Point point)
     {
-        //TODO
-        return  new Vector<>();
+        return new Vector(this.xyz.subtract(point.xyz));
     }
 
-    public Point add(Vector vector)
+    public Point add(primitives.Vector vector)
     {
-        //TODO
-        return  new Point(0,0,0);
+        return  new Point(this.xyz.add(vector.xyz));
     }
 
     public double distanceSquared(Point point)
     {
-        //TODO
-        return 0;
+        double dx = this.xyz.d1() - point.xyz.d1();
+        double dy = this.xyz.d2() - point.xyz.d2();
+        double dz = this.xyz.d3() - point.xyz.d3();
+        return dx * dx + dy * dy + dz * dz;
+
     }
 
     public double distance(Point point)
     {
-        //TODO
-        return 0;
+        return Math.sqrt(distanceSquared(point));
     }
 
 }
