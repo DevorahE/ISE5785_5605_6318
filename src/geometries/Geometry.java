@@ -2,8 +2,17 @@ package geometries;
 
 import primitives.*;
 
+/**
+ * class Geometries is a class representing a set of geometric shapes
+ *
+ * @author Devorah Wajs and Guila Czerniewicz
+ */
+
 public abstract class Geometry {
 
+    /**
+     * abstract function to get the normal of the vector
+     */
     public abstract Vector getNormal(Point point);
 
 }
