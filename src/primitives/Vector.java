@@ -4,7 +4,7 @@ public class Vector extends Point{
 
     public Vector(double x, double y, double z) throws IllegalArgumentException{
         super(x,y,z);
-        if((((Point)this).equals(Point.ZERO)))
+        if(xyz.equals(Double3.ZERO))
             throw new IllegalArgumentException("The vector is ZERO!");
     }
 
@@ -12,7 +12,7 @@ public class Vector extends Point{
     {
         super(xyz);
 
-        if(((Point)this).equals(Point.ZERO))
+        if(xyz.equals(Double3.ZERO))
             throw new IllegalArgumentException("The vector is ZERO!");
     }
 
