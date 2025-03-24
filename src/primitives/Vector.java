@@ -4,14 +4,15 @@ public class Vector extends Point{
 
     public Vector(double x, double y, double z) throws IllegalArgumentException{
         super(x,y,z);
-        if(this.equals(ZERO))
+        if((((Point)this).equals(Point.ZERO)))
             throw new IllegalArgumentException("The vector is ZERO!");
     }
 
     public Vector(Double3 xyz) throws IllegalArgumentException
     {
         super(xyz);
-        if(this.equals(ZERO))
+
+        if(((Point)this).equals(Point.ZERO))
             throw new IllegalArgumentException("The vector is ZERO!");
     }
 
@@ -51,6 +52,9 @@ public class Vector extends Point{
 
     public Vector normalize()
     {
+        if(Util.isZero(length()))
+            throw new ArithmeticException("Can't normalize vector ZERO");
+
         return new Vector(xyz.reduce(this.length()));
     }
 
