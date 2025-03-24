@@ -1,6 +1,6 @@
 /*
-* 2045605 - Guila Czerniewicz
-* 209606318 - Devorah Wajs
+* 2045605 - Guila Czerniewicz - guilacz03@gmail.com
+* 209606318 - Devorah Wajs - pandaperle@gmail.com
 * */
 
 package test;
