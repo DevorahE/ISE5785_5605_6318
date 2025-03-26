@@ -48,12 +48,12 @@ public class Vector extends Point{
     /**
      * Cales a vector into a new vector where each coordinate is multiplied by the scale factor
      *
-     * @param d
+     * @param scalar
      * @return vector
      */
-    public Vector scale(double d)
+    public Vector scale(double scalar)
     {
-        return new Vector(this.xyz.scale(d));
+        return new Vector(this.xyz.scale(scalar));
     }
 
     /**
@@ -124,6 +124,6 @@ public class Vector extends Point{
 
     @Override
     public String toString() {
-        return super.toString();
+        return  "->" + super.toString();
     }
 }
