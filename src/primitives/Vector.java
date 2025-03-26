@@ -109,9 +109,6 @@ public class Vector extends Point{
      */
     public Vector normalize()
     {
-        if(Util.isZero(length()))
-            throw new ArithmeticException("Can't normalize vector ZERO");
-
         return new Vector(xyz.reduce(this.length()));
     }
 
