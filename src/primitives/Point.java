@@ -17,7 +17,7 @@ public class Point {
     /**
      * 3-dimensional coordinates
      */
-    public static final Point ZERO = new Point(0,0,0);
+    public static final Point ZERO = new Point(Double3.ZERO);
 
     /**
      * Constructor to initialize Point based object with 3 number values
