@@ -1,7 +1,7 @@
 package geometries;
 
 /**
- * Unit tests for primitives.Vector class
+ * Unit tests for primitives.PlaneTest class
  * @author Devorah Wajs and Guila Czerniewicz
  */
 
@@ -66,5 +66,29 @@ class PlaneTest {
                         new Plane(new Point(0,0,0), new Point(1,1,1), new Point(2,2,2)),
                 "ERROR: Plane constructor did not throw exception for collinear points");
 
+    }
+
+    /** Test method for {@link geometries.Plane#getNormal(primitives.Point)}. */
+    @Test
+    void testGetNormal() {
+        // ============ Equivalence Partitions Tests ==============
+        // TC01: There is a simple single test here - using a quad
+        Point[] points =
+                { new Point(0, 0, 1), new Point(1, 0, 0), new Point(0, 1, 0), new Point(-1, 1, 1) };
+        Plane plane = new Plane(points[0], points[1], points[2]);
+
+        // ensure there are no exceptions
+        assertDoesNotThrow(() -> plane.getNormal(new Point(0, 0, 1)), "");
+
+        // generate the test result
+        Vector result = plane.getNormal(new Point(0, 0, 1));
+
+        // ensure |result| = 1
+        assertEquals(1, result.length(), DELTA, "Plane's normal is not a unit vector");
+
+        // ensure the result is orthogonal to all the edges
+        for (int i = 0; i < 3; ++i)
+            assertEquals(0d, result.dotProduct(points[i].subtract(points[i == 0 ? 3 : i - 1])), DELTA,
+                    "Plane's normal is not orthogonal to one of the edges");
     }
 }
