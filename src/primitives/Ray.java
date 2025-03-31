@@ -48,5 +48,11 @@ public class Ray {
                 && this.direction.equals(other.direction);
     }
 
+    public Point getHead() {
+        return head;
+    }
 
+    public Vector getDirection() {
+        return direction;
+    }
 }

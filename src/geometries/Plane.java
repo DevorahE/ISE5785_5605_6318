@@ -31,8 +31,13 @@ public class Plane extends Geometry{
      */
     public Plane(Point p1, Point p2, Point p3 )
     {
+        //Calculating normal by 3 points
+        Vector v0 = p1.subtract(p2);
+        Vector v1 = p3.subtract(p2);
+        Vector v2 = v0.crossProduct(v1);
+
+        this.normal = v2.normalize();;
         this.q= p1;
-        this.normal= null;
     }
 
 
