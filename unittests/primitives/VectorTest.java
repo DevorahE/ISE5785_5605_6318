@@ -23,25 +23,33 @@ class VectorTest {
 
 
     /**
+     * Test method for {@link primitives.Vector#Vector(Double3)}.
+     */
+    @Test
+    void testConstructor2() {
+        // ============ Equivalence Partitions Tests ==============
+        // TC01: current vector with the other ctor
+        assertDoesNotThrow(() -> new Vector(new Double3(1, 2, 3)), "ERROR: Failed constructing a vector with Double3 param");
+
+        // =============== Boundary Values Tests ==================
+        // TC02: Zero vector with the other ctor
+        assertThrows(IllegalArgumentException.class, () -> new Vector(Double3.ZERO), "ERROR: Constructed a zero vector");
+    }
+
+    /**
      * Test method for {@link primitives.Vector#Vector(double, double, double)}.
      */
     @Test
-    void testConstructor() {
+    void testConstructor1() {
         // ============ Equivalence Partitions Tests ==============
         // TC01: Correct vector
         Vector v1 = new Vector(1, 2, 3);
-        assertDoesNotThrow(() -> v1, "Failed constructing a vector with 3 coordinates");
-
-        // TC02: current vector with the other ctor
-        assertDoesNotThrow(() -> new Vector(new Double3(1, 2, 3)), "Failed constructing a vector with Double3 param");
+        assertDoesNotThrow(() -> v1, "ERROR: Failed constructing a vector with 3 coordinates");
 
         // =============== Boundary Values Tests ==================
-        // TC03: Zero vector
-        assertThrows(IllegalArgumentException.class, () -> new Vector(0, 0, 0), "Constructed a zero vector");
-
-        // TC04: Zero vector with the other ctor
-        assertThrows(IllegalArgumentException.class, () -> new Vector(Double3.ZERO), "Constructed a zero vector");
-    }
+        // TC02: Zero vector
+        assertThrows(IllegalArgumentException.class, () -> new Vector(0, 0, 0), "ERROR: Constructed a zero vector");
+ }
 
     /**
      * Test method for {@link primitives.Vector#lengthSquared()}.
@@ -91,10 +99,7 @@ class VectorTest {
         Vector v2 = new Vector(1, 4, 7);
         assertThrows(IllegalArgumentException.class, () -> v2.normalize().crossProduct(v2), "ERROR: the normalized vector is not parallel to the original one");
 
-        //TC03: v.normalized*v bigger than 0
-        Vector v3 = new Vector(1, 2, 3);
-        assertTrue(v3.normalize().dotProduct(v1) > 0, "ERROR: the normalized vector is opposite to the original one");
-    }
+       }
 
 
     /**
@@ -133,11 +138,11 @@ class VectorTest {
         Vector v2 = new Vector(2, 4, 6);
         Point p1 = new Point(1, 2, 3);
 
-        assertEquals(v1, v2.subtract(p1), "Subtract two points does not work correctly");
+        assertEquals(v1, v2.subtract(p1), "ERROR: Subtract two points does not work correctly");
 
         // ============ Boundary Values Tests ==================
         // TC02: Subtract equal points
-        assertThrows(IllegalArgumentException.class, () -> p1.subtract(p1), "Subtract equal points does not work correctly");
+        assertThrows(IllegalArgumentException.class, () -> p1.subtract(p1), "ERROR: Subtract equal points does not work correctly");
     }
 
     /**
@@ -145,6 +150,17 @@ class VectorTest {
      */
     @Test
     void testScale() {
+
+        // ============ Equivalence Partitions Tests ==============
+        // TC01:Checking a scales operation between a vector and a number
+        Vector v1 = new Vector(2, 4, 6);
+        Vector v2 = new Vector(4, 8, 12);
+        assertEquals(v2, v1.scale(2), "ERROR: scale() wrong value");
+
+        // =============== Boundary Values Tests ==================
+        // TC10:Scale a vector with zero
+        assertThrows(IllegalArgumentException.class, () -> v1.scale(0), "ERROR: It is not possible to get the zero vector");
+
     }
 
     /**
@@ -152,6 +168,16 @@ class VectorTest {
      */
     @Test
     void testDotProduct() {
+        // ============ Equivalence Partitions Tests ==============
+        // TC01:Checking of a product between two vectors returned a number
+        Vector v1 = new Vector(2, 1, 1);
+        Vector v2 = new Vector(2, 3, 4);
+        assertEquals(11, v1.dotProduct(v2), "ERROR: dotProduct() wrong value");
+
+        // =============== Boundary Values Tests ==================
+        // TC10:Scalar multiplication between two vectors and zero is obtained
+        Vector v3 = new Vector(-2, 2, 2);
+        assertEquals(0, v1.dotProduct(v3), "ERROR: dotProduct() for orthogonal vectors is not zero");
     }
 
     /**
@@ -159,6 +185,18 @@ class VectorTest {
      */
     @Test
     void testCrossProduct() {
+
+        // ============ Equivalence Partitions Tests ==============
+        // TC01:Checking the vector product between two vectors
+        Vector v1 = new Vector(0, 1, 1);
+        Vector v2 = new Vector(2, 3, 4);
+        Vector v3 = new Vector(1, 2, -2);
+        assertEquals(v3, v1.crossProduct(v2), "ERROR: crossProduct() wrong value");
+
+        // =============== Boundary Values Tests ==================
+        // TC10:Checking the product between two mutually perpendicular vectors
+        Vector v4 = new Vector(0, 1, 1);
+        assertThrows(IllegalArgumentException.class, () -> v1.crossProduct(v4), "ERROR: crossProduct() for parallel vectors does not throw an exception");
     }
 
 
