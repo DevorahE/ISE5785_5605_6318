@@ -9,12 +9,13 @@ import org.junit.jupiter.api.Test;
 import geometries.Plane;
 import geometries.Polygon;
 import primitives.*;
-
 /**
  * Testing Polygons
  * @author Dan
  */
-class PolygonTests {
+
+class PolygonTest {
+
     /**
      * Delta value for accuracy when comparing the numbers of type 'double' in
      * assertEquals
@@ -88,4 +89,5 @@ class PolygonTests {
             assertEquals(0d, result.dotProduct(pts[i].subtract(pts[i == 0 ? 3 : i - 1])), DELTA,
                     "Polygon's normal is not orthogonal to one of the edges");
     }
+
 }
