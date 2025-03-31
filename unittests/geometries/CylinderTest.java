@@ -19,43 +19,39 @@ class CylinderTest {
      /** Test method for {@link geometries.Cylinder#getNormal(primitives.Point)}. */
     @Test
     void testGetNormal() {
+        Vector v1 = new Vector(0, 0, -1);
+        Vector v2 = new Vector(0, 0, 1);
+        Cylinder cylinder = new Cylinder(1, new Ray(Point.ZERO, v2), 1);
+        // ============ Equivalence Partitions Tests ==============
+        // TC01: the point is on the top outer surface of the cylinder
+        assertEquals(new Vector(0, 1, 0),
+                cylinder.getNormal(new Point(0, 1, 0.5)),
+                "Bad normal to cylinder");
 
-        // Create a cylinder with a radius of 2, axis passing through the origin (0, 0, 0) in the Z direction, and a height of 4
-        Ray axis = new Ray(new Point(0, 0, 0), new Vector(0, 0, 1));  // Axis along the Z-axis
-        Cylinder cylinder = new Cylinder(2, axis, 4);
+        // TC02: the point is on the bottom outer surface of the cylinder
+        assertEquals(v1, cylinder.getNormal(new Point(0, 0.5, 0)),
+                "Bad normal to cylinder");
 
-        // Test with a point on the cylinder surface, e.g., (2, 0, 2)
-        Point pointOnCylinder = new Point(2, 0, 2);
+        // TC03: the point is on the side outer surface of the cylinder
+        assertEquals(v2, cylinder.getNormal(new Point(0, 0.5, 1)),
+                "Bad normal to cylinder");
 
-        // The expected normal vector at this point: (2, 0, 2) - (0, 0, 0) = (2, 0, 2)
-        // Project this onto the plane perpendicular to the axis (Z-axis in this case), resulting in the vector (2, 0, 0)
-        // After normalization: (1, 0, 0)
-        Vector expectedNormal = new Vector(1, 0, 0);
+        // =============== Boundary Values Tests ==================
+        // TC04: the point is on the top edge of the cylinder;
+        assertEquals(v2, cylinder.getNormal(new Point(0, 1, 1)),
+                "Bad normal to cylinder");
 
-        // Call the getNormal method
-        Vector normal = cylinder.getNormal(pointOnCylinder);
+        // TC05: the point is on the bottom edge of the cylinder
+        assertEquals(v1, cylinder.getNormal(new Point(0, 1, 0)),
+                "Bad normal to cylinder");
 
-        // Check if the normal vector is a unit vector (length = 1)
-        assertEquals(1, normal.length(), DELTA, "The normal vector is not a unit vector");
+        // TC06: the point is in the middle bottom outer surface of the cylinder
+        assertEquals(v1, cylinder.getNormal(Point.ZERO),
+                "Bad normal to cylinder");
 
-        // Check if the normal vector is in the correct direction (it should be perpendicular to the axis and in the plane of the cylinder)
-        assertEquals(expectedNormal, normal, "The normal vector is incorrect");
+        // TC07: the point is in the middle top edge of the cylinder
+        assertEquals(v2, cylinder.getNormal(new Point(0, 0, 1)),
+                "Bad normal to cylinder");
 
-        // Test with another point on the cylinder, e.g., (0, 2, 1)
-        pointOnCylinder = new Point(0, 2, 1);
 
-        // Expected normal vector: (0, 2, 1) - (0, 0, 0) = (0, 2, 1)
-        // Project this onto the plane perpendicular to the axis (Z-axis), resulting in the vector (0, 2, 0)
-        // After normalization: (0, 1, 0)
-        expectedNormal = new Vector(0, 1, 0);
-
-        // Call the getNormal method again
-        normal = cylinder.getNormal(pointOnCylinder);
-
-        // Check if the normal vector is a unit vector (length = 1)
-        assertEquals(1, normal.length(), DELTA, "The normal vector is not a unit vector");
-
-        // Check if the normal vector is in the correct direction
-        assertEquals(expectedNormal, normal, "The normal vector is incorrect");
-    }
-}
+    } }
