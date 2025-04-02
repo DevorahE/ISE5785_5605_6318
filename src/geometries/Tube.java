@@ -4,6 +4,8 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import java.util.List;
+
 
 /**
  * class Tube is a class representing a tube
@@ -43,5 +45,10 @@ public class Tube extends RadialGeometry{
         Point newCenter = axis.getHead().add(axis.getDirection().scale(projection));//Calculate the "new" center of the tube that is in front of the given point
 
         return point.subtract(newCenter).normalize();
+    }
+
+    @Override
+    public List<Point> findIntsersections(Ray ray) {
+        return null;
     }
 }
