@@ -95,49 +95,51 @@ class PlaneTest {
     }
 
     /**
-     * Test method for {@link geometries.Plane#findIntsersections(Ray)}
+     * Test method for {@link geometries.Plane#findIntersections(Ray)}
      */
     @Test
-    void testGetIntersection() {
+    void testFindIntersection() {
 
-        // ============ Equivalence Partitions Tests ==============
         Point p1 = new Point(0, 1, 1);
         Point p2 = new Point(0, 0, 2);
         Point p3 = new Point(0, 0, 1);
-        Point p4 = new Point(1, 0, 0);
         Vector v1 = new Vector(0, 1, 1);
         Vector v2 = new Vector(0, 0, 1);
         Vector v3 = new Vector(0, 1, 0);
         Vector v4 = new Vector(0, 0, 1);
         Plane plane = new Plane(p3, v4);
 
+        // ============ Equivalence Partitions Tests ==============
+
         // TC01: Test that the ray does not intersect the plane
-        assertNull(plane.findIntersections(new Ray(p2, v1)), "Failed to find the intersection point when the ray does not intersect the plane");
+        assertNull(plane.findIntersections(new Ray(p2, v1)), "ERROR: Failed to find the intersection point when the ray does not intersect the plane");
 
         // TC02: Test that the ray intersect the plane
-        assertEquals(List.of(p1), plane.findIntersections(new Ray(p2, new Vector(0, 1, -1))), "Failed to find the intersection point when the ray intersect the plane");
+        assertEquals(List.of(p1), plane.findIntersections(new Ray(p2, new Vector(0, 1, -1))), "ERROR: Failed to find the intersection point when the ray intersect the plane");
 
         // =============== Boundary Values Tests =================
 
         // TC03: Test that the ray is parallel to the plane
-        assertNull(plane.findIntersections(new Ray(p2, v3)), "Failed to find the intersection point when the ray is parallel to the plane");
+        assertNull(plane.findIntersections(new Ray(p2, v3)), "ERROR: Failed to find the intersection point when the ray is parallel to the plane");
 
         // TC04: Test that the ray is parallel to the plane and included in the plane
-        assertNull(plane.findIntersections(new Ray(p1, v3)), "Failed to find the intersection point when the ray is parallel to the plane and included in the plane");
+        assertNull(plane.findIntersections(new Ray(p1, v3)), "ERROR: Failed to find the intersection point when the ray is parallel to the plane and included in the plane");
 
-        // TC05: T that the ray is orthogonal to the plane
-        assertEquals(List.of(p3), plane.findIntersections(new Ray(new Point(0, 0, -1), v2)), "Failed to find the intersection point when the ray is orthogonal to the plane");
+        // TC05: Test that the ray is orthogonal to the plane
+        assertEquals(List.of(p3), plane.findIntersections(new Ray(new Point(0, 0, -1), v2)),
+                "ERROR: Ray is orthogonal and should intersect at " + p3);
 
-        // TC06: Test that the ray is orthogonal to the plane and start in the plane
-        assertNull(plane.findIntersections(new Ray(p3, v2)), "Failed to find the intersection point when the ray is orthogonal to the plane and start in the plane");
+        // TC06: Test that the ray is orthogonal and starts in the plane
+        assertNull(plane.findIntersections(new Ray(p3, v2)), "ERROR: Failed to find the intersection point when the ray is orthogonal to the plane and start in the plane");
 
-        // TC07: Test that the ray is orthogonal to the plane and start outside the plane
-        assertNull(plane.findIntersections(new Ray(p2, v2)), "Failed to find the intersection point when the ray is orthogonal to the plane and start outside the plane");
+        // TC07: Test that the ray is orthogonal and starts after the plane
+        assertNull(plane.findIntersections(new Ray(p2, v2)), "ERROR: Failed to find the intersection point when the ray is orthogonal to the plane and start outside the plane");
 
-        // TC08: Test that the ray start at the plane
-        assertNull(plane.findIntersections(new Ray(p1, v1)), "Failed to find the intersection point when the ray start at the plane");
+        // TC08: Test that the ray starts inside the plane
+        assertNull(plane.findIntersections(new Ray(p1, v1)), "ERROR: Failed to find the intersection point when the ray start at the plane");
 
-        // TC09: Test that the ray start at the plane at the point that sent to the constructor
-        assertNull(plane.findIntersections(new Ray(p3, v1)), "Failed to find the intersection point when the ray start at the plane at the point that sent to the constructor");
+        // TC09: Test that the ray starts at the reference point of the plane
+        assertNull(plane.findIntersections(new Ray(p3, v1)), "ERROR: Failed to find the intersection point when the ray start at the plane at the point that sent to the constructor");
     }
+
 }
