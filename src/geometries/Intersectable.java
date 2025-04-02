@@ -18,6 +18,6 @@ public interface Intersectable {
      * @return A list of intersection points between the object and the ray.
      */
 
-    public List<Point> findIntsersections(Ray ray);
+    public List<Point> findIntersections(Ray ray);
 
 }
