@@ -1,7 +1,6 @@
 package geometries;
 
-import primitives.Point;
-import primitives.Ray;
+import primitives.*;
 
 import java.util.List;
 
@@ -24,6 +23,34 @@ public class Triangle extends Polygon{
 
     @Override
     public List<Point> findIntersections(Ray ray) {
-        return null;
+        // Compute vectors from the ray's head to the triangle's vertices
+        Vector v1 = vertices.get(0).subtract(ray.getHead());
+        Vector v2 = vertices.get(1).subtract(ray.getHead());
+        Vector v3 = vertices.get(2).subtract(ray.getHead());
+
+        // Compute normal vectors for the triangle's edges
+        Vector n1 = v1.crossProduct(v2).normalize();
+        Vector n2 = v2.crossProduct(v3).normalize();
+        Vector n3 = v3.crossProduct(v1).normalize();
+
+        // Compute dot products of the ray direction with the normal vectors
+        double s1 = ray.getDirection().dotProduct(n1);
+        double s2 = ray.getDirection().dotProduct(n2);
+        double s3 = ray.getDirection().dotProduct(n3);
+
+        // If any dot product is zero, the ray is parallel to the corresponding edge
+        if (Util.isZero(s1) || Util.isZero(s2) || Util.isZero(s3)) {
+            return null; // The ray is parallel to one of the edges
+        }
+
+        // Check if the signs of the dot products are consistent
+        if ((s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)) {
+            // Create a plane from the triangle's vertices
+            Plane plane = new Plane(vertices.get(0), vertices.get(1), vertices.get(2));
+            // Find intersections with the plane
+            return plane.findIntersections(ray);
+        }
+
+        return null; // No intersection with the triangle
     }
 }
