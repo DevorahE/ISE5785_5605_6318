@@ -88,7 +88,7 @@ public class Polygon extends Geometry {
         List<Vector> normals = new ArrayList<>(size);
 
         // Get the starting point and direction of the ray
-        final Point startPoint = ray.getHead();
+        final Point startPoint = ray.getPoint(0);
         final Vector dir = ray.getDirection();
 
         // Calculate the normal vector for each edge of the polygonal base

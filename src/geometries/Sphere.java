@@ -4,7 +4,10 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static primitives.Util.alignZero;
 
 
 /**
@@ -39,34 +42,35 @@ public class Sphere extends RadialGeometry{
 
     @Override
     public List<Point> findIntersections(Ray ray) {
+        Vector v = ray.getDirection();
+        Point p0 = ray.getPoint(0);
 
-        // Case when the ray starts at the center of the sphere
-        if (center.equals(ray.getHead()))
-            return List.of(ray.getHead().add(ray.getDirection().scale(radius)));
+        // if the ray starts at the center of the sphere
 
-        // Vector from the ray's head to the center of the sphere
-        Vector u = (center.subtract(ray.getHead()));
-        // Projection of u onto the ray direction
-        double tm = ray.getDirection().dotProduct(u);
-        // Distance from the sphere center to the closest point on the ray
-        double d = Math.sqrt(u.lengthSquared() - tm * tm);
+        if(p0.equals(center))
+            return List.of(p0.add(v.scale(radius)));
 
-        // If the distance is greater than the radius or the sphere is behind the ray
-        if (d >= radius || tm < 0)
-            return null; //There aren't intersections
+        Vector u = center.subtract(p0);
+        double tm = alignZero(v.dotProduct(u));
+        double d2 = alignZero(u.lengthSquared() - tm * tm);
 
-        // Compute th, which is the distance from the closest point to the intersection points
-        double th = Math.sqrt(radius * radius - d * d);
-        double t1 = tm - th;
-        double t2 = tm + th;
+        if(alignZero(d2 - radius * radius)>0)
+            return null;
 
-        // If both intersection points are in front of the ray
-        if (t1 > 0 && t2 > 0)
-            return List.of(ray.getHead().add(ray.getDirection().scale(t1)), ray.getHead().add(ray.getDirection().scale(t2)));
-        if (t1 > 0)
-            return List.of(ray.getHead().add(ray.getDirection().scale(t1)));
+        double th = alignZero(Math.sqrt(radius * radius - d2));
+        double t1 = alignZero(tm - th);
+        double t2 = alignZero(tm + th);
 
-        // We know that t2 > 0, so we return the second intersection point
-        return List.of(ray.getHead().add(ray.getDirection().scale(t2)));
+        if(t1 > 0 && t2 > 0)
+            return List.of(ray.getPoint(t1), ray.getPoint(t2));
+
+        if(t1 > 0)
+            return List.of(ray.getPoint(t1));
+
+        if(t2 > 0)
+            return List.of(ray.getPoint(t2));
+
+        return null;
+
     }
 }

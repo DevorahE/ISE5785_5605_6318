@@ -24,9 +24,9 @@ public class Triangle extends Polygon{
     @Override
     public List<Point> findIntersections(Ray ray) {
         // Compute vectors from the ray's head to the triangle's vertices
-        Vector v1 = vertices.get(0).subtract(ray.getHead());
-        Vector v2 = vertices.get(1).subtract(ray.getHead());
-        Vector v3 = vertices.get(2).subtract(ray.getHead());
+        Vector v1 = vertices.get(0).subtract(ray.getPoint(0));
+        Vector v2 = vertices.get(1).subtract(ray.getPoint(0));
+        Vector v3 = vertices.get(2).subtract(ray.getPoint(0));
 
         // Compute normal vectors for the triangle's edges
         Vector n1 = v1.crossProduct(v2).normalize();

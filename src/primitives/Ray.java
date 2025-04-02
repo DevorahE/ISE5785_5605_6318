@@ -48,9 +48,13 @@ public class Ray {
                 && this.direction.equals(other.direction);
     }
 
-    public Point getHead() {
-        return head;
+    public Point getPoint(double t) {
+        // if t is zero, return the head point
+        if(Util.isZero(t))
+            return head;
+        return head.add(direction.scale(t));
     }
+
 
     public Vector getDirection() {
         return direction;

@@ -33,16 +33,16 @@ public class Tube extends RadialGeometry{
 
     @Override
     public Vector getNormal(Point point) {
-        double projection = axis.getDirection().dotProduct(point.subtract(axis.getHead())); //Calculate the projection of the point on tube's ray
+        double projection = axis.getDirection().dotProduct(point.subtract(axis.getPoint(0))); //Calculate the projection of the point on tube's ray
 
         // If projection == 0, the point is perpendicular to the tube's axis at its origin,
         // so the normal is simply the vector from the axis head to the point.
         if (projection == 0)
-             return point.subtract(axis.getHead()).normalize();
+             return point.subtract(axis.getPoint(0)).normalize();
 
 
         //The point is on the body of the tube
-        Point newCenter = axis.getHead().add(axis.getDirection().scale(projection));//Calculate the "new" center of the tube that is in front of the given point
+        Point newCenter = axis.getPoint(0).add(axis.getDirection().scale(projection));//Calculate the "new" center of the tube that is in front of the given point
 
         return point.subtract(newCenter).normalize();
     }
