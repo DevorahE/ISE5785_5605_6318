@@ -82,7 +82,7 @@ class SphereTest {
         assertEquals(List.of(new Point(0, 0.5, 1 - sqrt075)), sphere.findIntersections(new Ray(p5, new Vector(0, 0, -1))),
                 "ERROR: Failed to find the intersection point when the ray start inside the sphere");
 
-        //tests for tangential rays:
+        //tests for tangential ray:
 
         // TC07 The ray is tangential to the sphere and start before the sphere
         assertNull(sphere.findIntersections(new Ray(new Point(-1, 1, 0), v1)),
