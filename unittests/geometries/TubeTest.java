@@ -29,7 +29,7 @@ class TubeTest {
 
         // =============== Boundary Values Tests ==================
         // TC02: Point on axis → should throw exception
-        Point axisPoint = new Point(0, 0, 5);
+        Point axisPoint = new Point(0, 0, 0);
         assertThrows(IllegalArgumentException.class,
                 () -> tube.getNormal(axisPoint),
                 "getNormal() did not throw on axis point");

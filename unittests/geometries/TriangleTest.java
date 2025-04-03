@@ -1,9 +1,5 @@
 package geometries;
 
-/**
- * Unit tests for primitives.TriangleTest class
- * @author Devorah Wajs and Guila Czerniewicz
- */
 
 import org.junit.jupiter.api.Test;
 import primitives.Point;
@@ -14,6 +10,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for primitives.Triangle class
+ * @author Devorah Wajs and Guila Czerniewicz
+ */
 class TriangleTest {
     /**
      * Delta value for accuracy when comparing the numbers of type 'double' in

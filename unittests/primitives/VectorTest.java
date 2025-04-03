@@ -21,6 +21,20 @@ class VectorTest {
      * Method for testing operations on single vector
      */
 
+    /**
+     * Test method for {@link primitives.Vector#Vector(double, double, double)}.
+     */
+    @Test
+    void testConstructor1() {
+        // ============ Equivalence Partitions Tests ==============
+        // TC01: Correct vector
+        Vector v1 = new Vector(1, 2, 3);
+        assertDoesNotThrow(() -> v1, "ERROR: Failed constructing a vector with 3 coordinates");
+
+        // =============== Boundary Values Tests ==================
+        // TC02: Zero vector
+        assertThrows(IllegalArgumentException.class, () -> new Vector(0, 0, 0), "ERROR: Constructed a zero vector");
+    }
 
     /**
      * Test method for {@link primitives.Vector#Vector(Double3)}.
@@ -35,21 +49,6 @@ class VectorTest {
         // TC02: Zero vector with the other ctor
         assertThrows(IllegalArgumentException.class, () -> new Vector(Double3.ZERO), "ERROR: Constructed a zero vector");
     }
-
-    /**
-     * Test method for {@link primitives.Vector#Vector(double, double, double)}.
-     */
-    @Test
-    void testConstructor1() {
-        // ============ Equivalence Partitions Tests ==============
-        // TC01: Correct vector
-        Vector v1 = new Vector(1, 2, 3);
-        assertDoesNotThrow(() -> v1, "ERROR: Failed constructing a vector with 3 coordinates");
-
-        // =============== Boundary Values Tests ==================
-        // TC02: Zero vector
-        assertThrows(IllegalArgumentException.class, () -> new Vector(0, 0, 0), "ERROR: Constructed a zero vector");
- }
 
     /**
      * Test method for {@link primitives.Vector#lengthSquared()}.
