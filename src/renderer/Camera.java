@@ -1,6 +1,9 @@
 package renderer;
 
 import primitives.*;
+
+import java.util.MissingResourceException;
+
 import static primitives.Util.isZero;
 
 public class Camera implements Cloneable {
@@ -194,8 +197,34 @@ public class Camera implements Cloneable {
          * @throws IllegalStateException if the camera is not properly configured
          */
         public Camera build()  {
+            String MISSING_DATA = "ERROR: Camera setup incomplete: missing rendering data.";
+            String CLASS_NAME = "Camera";
+
+            if (camera.location == null)
+                throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "location");
+            if (camera.vTo == null)
+                throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "vTo");
+            if (camera.vUp == null)
+                throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "vUp");
+            if (camera.vTo.lengthSquared() != 1)
+                throw new IllegalArgumentException("ERROR: THe vector vTo isn't normalized");
+            if (camera.vUp.lengthSquared() != 1)
+                throw new IllegalArgumentException("ERROR: THe vector vUp isn't normalized");
+            if (camera.width == 0)
+                throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "width");
+            if (camera.height == 0)
+                throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "height");
+            if (camera.distance == 0)
+                throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "distance");
+
+            // Compute vRight if not yet calculated
+            Vector vRight = camera.vTo.crossProduct(camera.vUp);
+            if (vRight.lengthSquared() == 0)
+                throw new IllegalArgumentException("ERROR: vTo and vUp cannot be parallel – cannot compute vRight.");
+            camera.vRight = vRight.normalize();
+
             try {
-                return (Camera) camera.clone();
+                return (Camera)camera.clone();
             } catch (CloneNotSupportedException e) {
                 return null;
             }
