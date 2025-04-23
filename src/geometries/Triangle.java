@@ -3,6 +3,7 @@ package geometries;
 import primitives.*;
 
 import java.util.List;
+import static primitives.Util.*;
 
 /**
  * class Triangle is a basic class representing a triangle
@@ -21,37 +22,46 @@ public class Triangle extends Polygon{
         super(p1, p2, p3);
     }
 
-    @Override
     public List<Point> findIntersections(Ray ray) {
-        // Compute vectors from the ray's head to the triangle's vertices
-        Point p0 = ray.getPoint(0);
-        Vector v1 = vertices.get(0).subtract(p0);
-        Vector v2 = vertices.get(1).subtract(p0);
-        Vector v3 = vertices.get(2).subtract(p0);
 
-        // Compute normal vectors for the triangle's edges
-        Vector n1 = v1.crossProduct(v2).normalize();
-        Vector n2 = v2.crossProduct(v3).normalize();
-        Vector n3 = v3.crossProduct(v1).normalize();
+        //  Calculate vectors for the triangle edges
+        Vector edge1 = vertices.get(1).subtract(vertices.get(0));
+        Vector edge2 = vertices.get(2).subtract(vertices.get(0));
 
-        // Compute dot products of the ray direction with the normal vectors
-        double s1 = ray.getDirection().dotProduct(n1);
-        double s2 = ray.getDirection().dotProduct(n2);
-        double s3 = ray.getDirection().dotProduct(n3);
+        Vector h = ray.getDirection().crossProduct(edge2);
+        double a = alignZero(edge1.dotProduct(h));
 
-        // If any dot product is zero, the ray is parallel to the corresponding edge
-        if (Util.isZero(s1) || Util.isZero(s2) || Util.isZero(s3)) {
-            return null; // The ray is parallel to one of the edges
+        // Ray is parallel to the triangle
+        if (isZero(a)) {
+            return null;
         }
 
-        // Check if the signs of the dot products are consistent
-        if ((s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)) {
-            // Create a plane from the triangle's vertices
-            //Plane plane = new Plane(vertices.get(0), vertices.get(1), vertices.get(2));
-            // Find intersections with the plane
-            return plane.findIntersections(ray);
+        double f = 1 / a;
+        Vector s = ray.getPoint(0).subtract(vertices.get(0));
+        double u = f * alignZero(s.dotProduct(h));
+
+        // Intersection point is outside the triangle
+        if (u <= 0 || u >= 1) {
+            return null;
         }
 
-        return null; // No intersection with the triangle
+        Vector q = s.crossProduct(edge1);
+        double v = f * ray.getDirection().dotProduct(q);
+
+        // Intersection point is outside the triangle
+        if (v <= 0 || u + v >= 1) {
+            return null;
+        }
+
+        // Compute intersection distance along the ray
+        double t = alignZero(f * edge2.dotProduct(q));
+
+        // Intersection is behind the ray's origin
+        if (t <= 0) {
+            return null;
+        }
+
+        // Return the intersection point
+        return List.of(ray.getPoint(t));
     }
 }
