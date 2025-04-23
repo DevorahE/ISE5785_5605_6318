@@ -23,11 +23,10 @@ public class Ray {
     /**
      * Constructor to initialize Ray based on point and a vector
      *
-     * @param head - Starting point - head of the ray
+     * @param head      - Starting point - head of the ray
      * @param direction - Direction vector of the ray
      */
-    public Ray(Point head, Vector direction)
-    {
+    public Ray(Point head, Vector direction) {
         this.head = head;
         this.direction = direction.normalize();
     }
@@ -48,9 +47,15 @@ public class Ray {
                 && this.direction.equals(other.direction);
     }
 
+    /**
+     * Calculates a point on the ray at a given distance from the head.
+     *
+     * @param t the scalar distance from the head of the ray. If t is zero, the head point is returned
+     * @return the point on the ray at the specified distance t from the head.
+     */
     public Point getPoint(double t) {
         // if t is zero, return the head point
-        if(Util.isZero(t))
+        if (Util.isZero(t))
             return head;
         return head.add(direction.scale(t));
     }

@@ -47,7 +47,7 @@ class TriangleTest {
 
     /** Test method for {@link geometries.Triangle#findIntersections(Ray)} */
     @Test
-    void testFindIntsersections() {
+    void testFindIntersections() {
         Triangle triangle = new Triangle(new Point(0, 0, 0), new Point(1, 0, 0), new Point(0, 1, 0));
 
         // ============ Equivalence Partitions Tests ==============

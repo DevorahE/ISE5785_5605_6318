@@ -89,6 +89,6 @@ public class Plane extends Geometry{
         }
 
         // Calculate and return the intersection point using the ray equation: p = ray.head + t * ray.direction
-        return List.of(ray.getPoint(0).add(ray.getDirection().scale(t)));
+        return List.of(ray.getPoint(t));
     }
 }

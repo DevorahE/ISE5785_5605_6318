@@ -42,7 +42,7 @@ public class Tube extends RadialGeometry{
 
 
         //The point is on the body of the tube
-        Point newCenter = axis.getPoint(0).add(axis.getDirection().scale(projection));//Calculate the "new" center of the tube that is in front of the given point
+        Point newCenter = axis.getPoint(projection);//Calculate the "new" center of the tube that is in front of the given point
 
         return point.subtract(newCenter).normalize();
     }

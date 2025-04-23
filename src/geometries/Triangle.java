@@ -24,9 +24,10 @@ public class Triangle extends Polygon{
     @Override
     public List<Point> findIntersections(Ray ray) {
         // Compute vectors from the ray's head to the triangle's vertices
-        Vector v1 = vertices.get(0).subtract(ray.getPoint(0));
-        Vector v2 = vertices.get(1).subtract(ray.getPoint(0));
-        Vector v3 = vertices.get(2).subtract(ray.getPoint(0));
+        Point p0 = ray.getPoint(0);
+        Vector v1 = vertices.get(0).subtract(p0);
+        Vector v2 = vertices.get(1).subtract(p0);
+        Vector v3 = vertices.get(2).subtract(p0);
 
         // Compute normal vectors for the triangle's edges
         Vector n1 = v1.crossProduct(v2).normalize();
@@ -46,7 +47,7 @@ public class Triangle extends Polygon{
         // Check if the signs of the dot products are consistent
         if ((s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)) {
             // Create a plane from the triangle's vertices
-            Plane plane = new Plane(vertices.get(0), vertices.get(1), vertices.get(2));
+            //Plane plane = new Plane(vertices.get(0), vertices.get(1), vertices.get(2));
             // Find intersections with the plane
             return plane.findIntersections(ray);
         }
