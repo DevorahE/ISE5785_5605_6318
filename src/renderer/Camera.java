@@ -189,7 +189,6 @@ public class Camera implements Cloneable {
             return this;
         }
 
-
         /**
          * Builds and returns a new Camera object with the specified properties.
          *
