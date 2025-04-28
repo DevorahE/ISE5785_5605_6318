@@ -55,7 +55,7 @@ public class Camera implements Cloneable {
     private Camera(){
         // Private constructor to prevent instantiation
     }
-    public Builder getBuilder() {
+    public static Builder getBuilder() {
         return new Builder();
     }
 
@@ -151,7 +151,7 @@ public class Camera implements Cloneable {
          * @return this Builder object
          * @throws IllegalArgumentException if width or height is not positive
        */
-        public Builder setVPSize(double width, double height) {
+        public Builder setVpSize(double width, double height) {
             if (width <= 0 || height <= 0)
                 throw new IllegalArgumentException("ERROR: VP size must be positive.");
             camera.width = width;
@@ -167,7 +167,7 @@ public class Camera implements Cloneable {
          * @return this Builder object
          * @throws IllegalArgumentException if distance is not positive
          */
-        public Builder setVPDistance(double distance) {
+        public Builder setVpDistance(double distance) {
             if (distance <= 0)
                 throw new IllegalArgumentException("ERROR: VP distance must be positive.");
             camera.distance = distance;

@@ -6,7 +6,14 @@ package primitives;
  * @author Devorah Wajs and Guila Czerniewicz
  */
 public class Vector extends Point{
+    // Defines a constant vector representing the X-axis direction (positive X, no Y or Z movement)
+    public static Vector AXIS_X = new Vector(1, 0, 0);
 
+    // Defines a constant vector representing the Y-axis direction (positive Y, no X or Z movement)
+    public static Vector AXIS_Y = new Vector(0, 1, 0);
+
+    // Defines a constant vector representing the Z-axis direction (positive Z, no X or Y movement)
+    public static Vector AXIS_Z = new Vector(0, 0, 1);
     /**
      * Constructor to initialize Vector based on 3 number values
      *
