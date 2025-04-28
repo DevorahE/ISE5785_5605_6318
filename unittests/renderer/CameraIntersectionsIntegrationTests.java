@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Integration tests for intersections between Camera rays and Geometries.
  * Testing the integration of Camera's ray generation and Geometries' findIntersections method.
+ * @author Devorah Wajs and Guila Czerniewicz
  */
 public class CameraIntersectionsIntegrationTests {
 

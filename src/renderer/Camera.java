@@ -6,6 +6,11 @@ import java.util.MissingResourceException;
 
 import static primitives.Util.isZero;
 
+/**
+ * The Camera class represents a camera in a 3D space with the ability to
+ * generate rays through pixels for rendering.
+ * @author Devorah Wajs and Guila Czerniewicz
+ */
 public class Camera implements Cloneable {
     // Camera properties
     private Point location = Point.ZERO; // Camera position
@@ -60,7 +65,11 @@ public class Camera implements Cloneable {
 
     }
 
-
+    /**
+     * Returns the location of the camera in the 3D space.
+     *
+     * @return the location of the camera.
+     */
     public Point getLocation() {
         return location;
     }
@@ -76,15 +85,29 @@ public class Camera implements Cloneable {
     public Vector getvRight() {
         return vRight;
     }
-
+    /**
+     * Returns the width of the view plane.
+     *
+     * @return the width of the view plane.
+     */
     public double getWidth() {
         return width;
     }
 
+    /**
+     * Returns the height of the view plane.
+     *
+     * @return the height of the view plane.
+     */
     public double getHeight() {
         return height;
     }
 
+    /**
+     * Returns the distance of the camera to the view plane.
+     *
+     * @return the distance to the view plane.
+     */
     public double getDistance() {
         return distance;
     }
@@ -92,10 +115,19 @@ public class Camera implements Cloneable {
     private Camera(){
         // Private constructor to prevent instantiation
     }
+
+    /**
+     * Returns a new {@link Builder} for constructing a {@code Camera} instance.
+     *
+     * @return a new {@link Builder}.
+     */
     public static Builder getBuilder() {
         return new Builder();
     }
 
+    /**
+     * A builder class for the Camera class.
+     */
     public static class Builder {
         /// initialization of camera here; no need of constructor
         private final Camera camera = new Camera();
