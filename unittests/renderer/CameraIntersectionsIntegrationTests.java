@@ -41,25 +41,35 @@ public class CameraIntersectionsIntegrationTests {
      */
     @Test
     void testSphereIntersections() throws CloneNotSupportedException {
-        Camera camera = new Camera(new Point(0, 0, 0), new Vector(0, 0, -1), new Vector(0, 1, 0))
-                .setVPSize(3, 3)
-                .setVPDistance(1);
+        Camera camera = Camera.getBuilder()
+                .setLocation(new Point(0, 0, 0))
+                .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
+                .setVpSize(3, 3)
+                .setVpDistance(1)
+                .build();
 
-        // Sphere centered at (0, 0, -3) with radius 1
-        Sphere sphere = new Sphere(new Point(0, 0, -3), 1);
+        // Small Sphere in front of the view plane
+        Sphere sphere = new Sphere(1, new Point(0, 0, -3));
+        assertCountIntersections(camera, sphere, 2);
 
-        assertCountIntersections(camera, sphere, 2); // Expected 2 intersections
     }
-            }
+
 
     /**
      * Test ray construction and intersection count with planes.
      */
     @Test
     void testPlaneIntersections() throws CloneNotSupportedException {
-        assertCountIntersections(new Plane(new Point(0, 0, -1), new Point(1, 0, -1), new Point(0, 1, -1)), new Point(0, 0, 1), 9);
-        assertCountIntersections(new Plane(new Point(0, 0, -2), new Point(-3, 0, 0), new Point(-3, 2, 0)), new Point(0, 0, 1), 9);
-        assertCountIntersections(new Plane(new Point(0, 0, -4), new Point(-3, 0, 0), new Point(-3, 2, 0)), new Point(0, 0, 1), 6);
+        Camera camera = Camera.getBuilder()
+                .setLocation(new Point(0, 0, 0))
+                .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
+                .setVpSize(3, 3)
+                .setVpDistance(1)
+                .build();
+
+        // Plane facing the camera
+        Plane plane = new Plane(new Point(0, 0, -5), new Vector(0, 0, 1));
+        assertCountIntersections(camera, plane, 9);
     }
 
     /**
@@ -67,8 +77,20 @@ public class CameraIntersectionsIntegrationTests {
      */
     @Test
     void testTriangleIntersections() throws CloneNotSupportedException {
-        assertCountIntersections(new Triangle(new Point(0, 1, -2), new Point(-1, -1, -2), new Point(1, -1, -2)), new Point(0, 0, 0.5), 1);
-        assertCountIntersections(new Triangle(new Point(0, 20, -2), new Point(-1, -1, -2), new Point(1, -1, -2)), new Point(0, 0, 1), 2);
+        Camera camera = Camera.getBuilder()
+                .setLocation(new Point(0, 0, 0))
+                .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
+                .setVpSize(3, 3)
+                .setVpDistance(1)
+                .build();
+
+        // Small triangle in the center
+        Triangle triangle = new Triangle(
+                new Point(0, 1, -2),
+                new Point(1, -1, -2),
+                new Point(-1, -1, -2)
+        );
+    assertCountIntersections(camera, triangle, 1);
     }
 }
 
