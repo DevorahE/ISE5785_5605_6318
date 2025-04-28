@@ -16,14 +16,51 @@ public class Camera implements Cloneable {
     private double height = 0.0; // Height of the view plane
     private double distance = 0.0; // Distance from the camera to the view plane
 
-    public Ray constructRay(int nX, int nY, int j, int i){
-        //todo
-        return null;
+
+
+    /**
+     * Constructs a ray through a specific pixel on the view plane.
+     *
+     * @param nX the number of pixels in the X direction.
+     * @param nY the number of pixels in the Y direction.
+     * @param j  the pixel index in the X direction.
+     * @param i  the pixel index in the Y direction.
+     * @return the constructed {@link Ray}.
+     */
+    public Ray constructRay(int nX, int nY, int j, int i) {
+
+        // Calculate the center point of the view plane
+        Point pC = location.add(vTo.scale(distance));
+
+        // Calculate the size of each pixel in the view plane
+        double rX =(width / (double)nX);
+        double rY = (height / (double)nY);
+
+        // Calculate the offset of the current pixel from the center
+        double xJ = (j - (nX - 1) / 2d) * rX;
+        double yI = -(i - (nY - 1) / 2d) * rY;
+
+        // Initialize the intersection point of the ray with the view plane
+        Point pIJ = pC;
+
+        // Adjust the intersection point based on the pixel offset
+        if (!isZero(xJ)) {
+            pIJ = pIJ.add(vRight.scale(xJ));
+        }
+        if (!isZero(yI)) {
+            pIJ = pIJ.add(vUp.scale(yI));
+        }
+
+        // Calculate the direction vector of the ray from the camera location to the pixel
+        Vector vIJ = pIJ.subtract(location);
+
+        // Return the constructed ray
+        return new Ray(location, vIJ);
+
+
     }
-    public Ray constructRayThroughPixel(int nX, int nY, double j, double i){
-        //todo
-        return null;
-    }
+
+
     public Point getLocation() {
         return location;
     }
