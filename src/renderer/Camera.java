@@ -160,8 +160,8 @@ public class Camera implements Cloneable {
             Vector vRight = vTo.crossProduct(approxUp).normalize();
             Vector vUp = vRight.crossProduct(vTo).normalize();
 
-            camera.vTo = vTo;
-            camera.vUp = vUp;
+            camera.vTo = vTo.normalize();
+            camera.vUp = vUp.normalize();
             return this;
         }
 
@@ -242,9 +242,9 @@ public class Camera implements Cloneable {
                 throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "vTo");
             if (camera.vUp == null)
                 throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "vUp");
-            if (camera.vTo.lengthSquared() != 1)
+            if (!isZero(camera.vTo.lengthSquared() - 1 ))
                 throw new IllegalArgumentException("ERROR: THe vector vTo isn't normalized");
-            if (camera.vUp.lengthSquared() != 1)
+            if (!isZero(camera.vUp.lengthSquared() - 1 ))
                 throw new IllegalArgumentException("ERROR: THe vector vUp isn't normalized");
             if (camera.width == 0)
                 throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "width");
