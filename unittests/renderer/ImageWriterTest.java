@@ -8,14 +8,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class ImageWriterTest {
 
     @Test
-    void testNY() {
-    }
-
-    @Test
-    void testNX() {
-    }
-
-    @Test
     void testWriteToImage() {
         ImageWriter imageWriter = new ImageWriter(800, 500);
 
@@ -31,7 +23,4 @@ class ImageWriterTest {
         imageWriter.writeToImage("firstImage");
     }
 
-    @Test
-    void testWritePixel() {
-    }
 }
