@@ -1,5 +1,6 @@
 package primitives;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -63,5 +64,17 @@ public class Ray {
 
     public Vector getDirection() {
         return direction;
+    }
+
+    /**
+     * Finds the closest point to the ray's head from a list of points.
+     * Currently, this method is not implemented and always returns null.
+     *
+     * @param listPoints the list of points to search for the closest point
+     * @return the closest point to the ray's head, or null if not implemented
+     */
+    public Point findClosestPoint(List<Point> listPoints)
+    {
+        return null;
     }
 }

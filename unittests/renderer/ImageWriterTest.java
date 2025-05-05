@@ -7,6 +7,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ImageWriterTest {
 
+    /**
+     * Test method for the writeToImage functionality of the ImageWriter class.
+     * This test creates an image of 800x500 pixels with a grid pattern.
+     * The grid lines are colored grey, and the rest of the pixels are turquoise.
+     * The resulting image is saved with the name "firstImage".
+     */
     @Test
     void testWriteToImage() {
         ImageWriter imageWriter = new ImageWriter(800, 500);
