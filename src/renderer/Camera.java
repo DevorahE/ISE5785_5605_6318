@@ -39,11 +39,22 @@ public class Camera implements Cloneable {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Prints a grid on the view plane for debugging purposes.
+     * @param interval
+     * @param color
+     * @return
+     */
     public Camera printGrid(int interval, Color color)
     {
         return this ;
     }
 
+    /**
+     * Writes the rendered image to a file.
+     * @param nameFile
+     * @return
+     */
     public Camera writeToImage(String nameFile)
     {
         return this ;
