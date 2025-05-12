@@ -21,6 +21,33 @@ public class Camera implements Cloneable {
     private double height = 0.0; // Height of the view plane
     private double distance = 0.0; // Distance from the camera to the view plane
 
+    private ImageWriter imageWriter;
+    private RayTracerBase rayTracer;
+    private int nX = 1;
+    private int nY = 1;
+
+    /**
+     * Renders the image by casting rays through each pixel of the view plane.
+     * This method is currently not implemented and throws an UnsupportedOperationException.
+     *
+     * @return the Camera instance for method chaining
+     * @throws UnsupportedOperationException if the method is called
+     */
+    public Camera renderImage()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public Camera printGrid(int interval, Color color)
+    {
+        return this ;
+    }
+
+    public Camera writeToImage(String nameFile)
+    {
+        return this ;
+    }
+
 
 
     /**
@@ -255,8 +282,26 @@ public class Camera implements Cloneable {
         public Builder setResolution(int nx,int ny){
             if (nx <= 0 || ny <= 0)
                 throw new IllegalArgumentException("ERROR: Resolution must be positive.");
+            camera.nX = nx;
+            camera.nY = ny;
             return this;
         }
+
+
+
+        /**
+         * Set the ray tracer
+         * @param rayTracer the ray tracer
+         * @return the camera builder
+         */
+        public Builder setRayTracer(RayTracerBase rayTracer) {
+            if (rayTracer == null)
+                throw new IllegalArgumentException("ERROR: RayTracer cannot be null.");
+            camera.rayTracer = rayTracer;
+            return this;
+        }
+
+
 
         /**
          * Builds and returns a new Camera object with the specified properties.
@@ -284,12 +329,18 @@ public class Camera implements Cloneable {
                 throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "height");
             if (camera.distance == 0)
                 throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "distance");
+            if  (camera.nX <= 0 || camera.nY <= 0)
+                throw new IllegalArgumentException("ERROR: The resolution cannot be negative");
 
             // Compute vRight if not yet calculated
             Vector vRight = camera.vTo.crossProduct(camera.vUp);
             if (vRight.lengthSquared() == 0)
                 throw new IllegalArgumentException("ERROR: vTo and vUp cannot be parallel – cannot compute vRight.");
             camera.vRight = vRight.normalize();
+
+            if(camera.rayTracer == null)
+                camera.rayTracer = new SimpleRayTracer(null);
+
 
             try {
                 return (Camera)camera.clone();
