@@ -66,6 +66,7 @@ public class Camera implements Cloneable {
         return this ;
     }
 
+
     /**
      * Writes the rendered image to a file.
      * @param nameFile
@@ -77,6 +78,15 @@ public class Camera implements Cloneable {
         return this ;
     }
 
+
+    /**
+     * Casts a ray through a specific pixel on the view plane and writes the color to the image.
+     *
+     * @param nx      the number of pixels in the X direction.
+     * @param ny      the number of pixels in the Y direction.
+     * @param column  the pixel index in the X direction.
+     * @param row     the pixel index in the Y direction.
+     */
     private void castRay(int nx, int ny, int column, int row)
     {
         Ray ray = constructRay(nx, ny, column, row);
