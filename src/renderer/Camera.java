@@ -36,31 +36,53 @@ public class Camera implements Cloneable {
      */
     public Camera renderImage()
     {
-        throw new UnsupportedOperationException();
+        int nx = imageWriter.nX();
+        int ny = imageWriter.nY();
+
+        for (int i=0; i < nx; i++)
+        {
+            for(int j=0; j < ny; j++)
+                castRay(nx, ny, j, i);
+        }
+        return this;
     }
 
     /**
      * Prints a grid on the view plane for debugging purposes.
      * @param interval
      * @param color
-     * @return
+     * @return this
      */
     public Camera printGrid(int interval, Color color)
     {
+        for(int i=0; i < imageWriter.nX(); i++)
+        {
+            for(int j=0; j < imageWriter.nY(); j++)
+            {
+                if (i % interval == 0 || j % interval == 0)
+                    imageWriter.writePixel(i, j, color);
+            }
+        }
         return this ;
     }
 
     /**
      * Writes the rendered image to a file.
      * @param nameFile
-     * @return
+     * @return this
      */
     public Camera writeToImage(String nameFile)
     {
+        imageWriter.writeToImage(nameFile);
         return this ;
     }
 
-
+    private void castRay(int nx, int ny, int column, int row)
+    {
+        Ray ray = constructRay(nx, ny, column, row);
+        Color color = rayTracer.traceRay(ray);
+        imageWriter.writePixel(column, row, color);
+    }
 
     /**
      * Constructs a ray through a specific pixel on the view plane.

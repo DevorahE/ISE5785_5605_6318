@@ -1,6 +1,7 @@
 package renderer;
 
 import primitives.Color;
+import primitives.Point;
 import primitives.Ray;
 import scene.Scene;
 
@@ -21,9 +22,13 @@ public class SimpleRayTracer extends RayTracerBase{
         super(scene);
     }
 
+    private Color calcColor(Point point)
+    {
+        return scene.ambientLight.getIntensity();
+    }
 
     @Override
     public Color traceRay(Ray ray) {
-        throw new UnsupportedOperationException("Not implemented yet");
+
     }
 }
