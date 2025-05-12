@@ -1,6 +1,7 @@
 package renderer;
 
 import primitives.*;
+import scene.Scene;
 
 import java.util.MissingResourceException;
 
@@ -291,13 +292,17 @@ public class Camera implements Cloneable {
 
         /**
          * Set the ray tracer
-         * @param rayTracer the ray tracer
+         * @param scene,
+         * @param rayTracerType
          * @return the camera builder
          */
-        public Builder setRayTracer(RayTracerBase rayTracer) {
-            if (rayTracer == null)
-                throw new IllegalArgumentException("ERROR: RayTracer cannot be null.");
-            camera.rayTracer = rayTracer;
+        public Builder setRayTracer(Scene scene, RayTracerType rayTracerType) {
+            if (scene == null || rayTracerType == null)
+                throw new IllegalArgumentException("ERROR: Scene and RayTracerType must not be null.");
+            if(rayTracerType == RayTracerType.SIMPLE)
+                camera.rayTracer = new SimpleRayTracer(scene);
+            else
+                camera.rayTracer = null;
             return this;
         }
 
@@ -341,7 +346,7 @@ public class Camera implements Cloneable {
             if(camera.rayTracer == null)
                 camera.rayTracer = new SimpleRayTracer(null);
 
-
+            camera.imageWriter = new ImageWriter(camera.nX, camera.nY);
             try {
                 return (Camera)camera.clone();
             } catch (CloneNotSupportedException e) {
