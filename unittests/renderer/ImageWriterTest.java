@@ -3,6 +3,9 @@ package renderer;
 import org.junit.jupiter.api.Test;
 import primitives.Color;
 
+import java.util.concurrent.Callable;
+
+import static java.awt.Color.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ImageWriterTest {
@@ -17,6 +20,7 @@ class ImageWriterTest {
 
         Color turquoise = new Color(26, 241,225);
         Color grey = new Color(71, 90,89);
+        Color gray = new Color(GRAY);
         for(int i=0; i < imageWriter.nX(); i++)
         {
             for(int j=0; j < imageWriter.nY(); j++)

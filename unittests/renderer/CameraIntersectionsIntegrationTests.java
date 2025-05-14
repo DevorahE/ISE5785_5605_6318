@@ -19,10 +19,8 @@ public class CameraIntersectionsIntegrationTests {
      * Integration tests for intersections between Camera rays and Geometries.
      * Testing the integration of Camera's ray generation and Geometries' findIntersections method.
      */
-    private void assertCountIntersections(Camera camera, Intersectable geometry, int expectedCount) throws CloneNotSupportedException {
+    private void assertCountIntersections(int expected, Intersectable geometry, Camera camera, int nX, int nY) throws CloneNotSupportedException {
         int count = 0;
-        int nX = 3; // View plane width in pixels
-        int nY = 3; // View plane height in pixels
 
         for (int i = 0; i < nY; i++) {
             for (int j = 0; j < nX; j++) {
@@ -34,7 +32,7 @@ public class CameraIntersectionsIntegrationTests {
             }
         }
 
-        assertEquals(expectedCount, count, "ERROR: Wrong number of intersections");
+        assertEquals(expected, count, "ERROR: Wrong number of intersections");
     }
 
     /**
@@ -51,7 +49,7 @@ public class CameraIntersectionsIntegrationTests {
 
         // Small Sphere in front of the view plane
         Sphere sphere = new Sphere(1, new Point(0, 0, -3));
-        assertCountIntersections(camera, sphere, 2);
+        assertCountIntersections(2, sphere, camera, 3, 3);
 
     }
 
@@ -70,7 +68,7 @@ public class CameraIntersectionsIntegrationTests {
 
         // Plane facing the camera
         Plane plane = new Plane(new Point(0, 0, -5), new Vector(0, 0, 1));
-        assertCountIntersections(camera, plane, 9);
+        assertCountIntersections(9, plane, camera, 3, 3);
     }
 
     /**
@@ -91,7 +89,7 @@ public class CameraIntersectionsIntegrationTests {
                 new Point(1, -1, -2),
                 new Point(-1, -1, -2)
         );
-    assertCountIntersections(camera, triangle, 1);
+    assertCountIntersections(1, triangle, camera, 3, 3);
     }
 }
 

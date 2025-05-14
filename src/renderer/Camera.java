@@ -42,7 +42,7 @@ public class Camera implements Cloneable {
         for (int i=0; i < nx; i++)
         {
             for(int j=0; j < ny; j++)
-                castRay(nx, ny, j, i);
+                castRay(j, i);
         }
         return this;
     }
@@ -82,14 +82,12 @@ public class Camera implements Cloneable {
     /**
      * Casts a ray through a specific pixel on the view plane and writes the color to the image.
      *
-     * @param nx      the number of pixels in the X direction.
-     * @param ny      the number of pixels in the Y direction.
-     * @param column  the pixel index in the X direction.
-     * @param row     the pixel index in the Y direction.
+     * @param column the pixel index in the X direction.
+     * @param row    the pixel index in the Y direction.
      */
-    private void castRay(int nx, int ny, int column, int row)
+    private void castRay(int column, int row)
     {
-        Ray ray = constructRay(nx, ny, column, row);
+        Ray ray = constructRay(nX, nY, column, row);
         Color color = rayTracer.traceRay(ray);
         imageWriter.writePixel(column, row, color);
     }
