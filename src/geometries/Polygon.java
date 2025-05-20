@@ -83,7 +83,14 @@ public class Polygon extends Geometry {
     public Vector getNormal(Point point) { return plane.getNormal(point); }
 
     @Override
-    public List<Point> findIntersections(Ray ray) {
+    public List<Intersection> calculateIntersectionsHelper(Ray ray){
+
+        // Find and return the intersection points of the ray with the plane
+        List<Point> intersections = plane.findIntersections(ray);
+
+        // If the ray does not intersect the plane or the intersection point is too far, return null
+        if (intersections == null || alignZero(intersections.getFirst().distanceSquared(ray.getPoint(0d))) > 0d) return null;
+
         // Initialize a list to hold the normals of the edges of the polygonal base
         List<Vector> normals = new ArrayList<>(size);
 
@@ -111,10 +118,7 @@ public class Polygon extends Geometry {
             }
         }
 
-        // Create a plane defined by the first three vertices of the polygon
-        Plane plane = new Plane(vertices.getFirst(), vertices.get(1), vertices.get(2));
+        return List.of(new Intersection(this, intersections.getFirst()));
 
-        // Find and return the intersection points of the ray with the plane
-        return plane.findIntersections(ray);
     }
 }

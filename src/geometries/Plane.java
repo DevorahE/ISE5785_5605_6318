@@ -72,8 +72,7 @@ public class Plane extends Geometry{
 
 
     @Override
-    public List<Point> findIntersections(Ray ray) {
-
+    public List<Intersection> calculateIntersectionsHelper(Ray ray){
         // Check if the ray is parallel to the plane (dot product equals zero)
         // or if the ray's starting point is the same as the plane's reference point
         if(ray.getDirection().dotProduct(normal) == 0 || q.equals(ray.getPoint(0))) {
@@ -89,6 +88,7 @@ public class Plane extends Geometry{
         }
 
         // Calculate and return the intersection point using the ray equation: p = ray.head + t * ray.direction
-        return List.of(ray.getPoint(t));
+        return List.of(new Intersection(this, ray.getPoint(t)));
+
     }
 }

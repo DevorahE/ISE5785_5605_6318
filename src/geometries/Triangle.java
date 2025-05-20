@@ -22,8 +22,8 @@ public class Triangle extends Polygon{
         super(p1, p2, p3);
     }
 
-    public List<Point> findIntersections(Ray ray) {
-
+    @Override
+    public List<Intersection> calculateIntersectionsHelper(Ray ray){
         //  Calculate vectors for the triangle edges
         Vector edge1 = vertices.get(1).subtract(vertices.get(0));
         Vector edge2 = vertices.get(2).subtract(vertices.get(0));
@@ -62,6 +62,6 @@ public class Triangle extends Polygon{
         }
 
         // Return the intersection point
-        return List.of(ray.getPoint(t));
+        return List.of(new Intersection(this, ray.getPoint(t)));
     }
 }
