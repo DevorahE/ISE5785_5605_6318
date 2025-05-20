@@ -89,8 +89,7 @@ public class Polygon extends Geometry {
         List<Point> intersections = plane.findIntersections(ray);
 
         // If the ray does not intersect the plane or the intersection point is too far, return null
-        if (intersections == null || alignZero(intersections.getFirst().distanceSquared(ray.getPoint(0d))) > 0d) return null;
-
+        if (intersections == null) return null;
         // Initialize a list to hold the normals of the edges of the polygonal base
         List<Vector> normals = new ArrayList<>(size);
 
