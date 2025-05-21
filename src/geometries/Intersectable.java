@@ -33,6 +33,12 @@ public abstract class Intersectable {
         return null;
     }
 
+    /**
+     * Finds intersection points between the intersectable object and a given ray.
+     * Calls calculateIntersectionsHelper
+     * @param ray
+     * @return A list of intersection points between the object and the ray.
+     */
     public final List<Intersection> calculateIntersections(Ray ray) {
        return calculateIntersectionsHelper(ray);
     }

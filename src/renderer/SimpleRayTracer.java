@@ -26,6 +26,8 @@ public class SimpleRayTracer extends RayTracerBase{
         super(scene);
     }
 
+
+
     /**
      * Calculate the color intensity in the scene
      * @param
@@ -33,8 +35,11 @@ public class SimpleRayTracer extends RayTracerBase{
      */
     private Color calcColor(Intersection intersection)
     {
-        return scene.ambientLight.getIntensity() .add(intersection.geometry.getEmission());
+        return scene.ambientLight.getIntensity()
+                .scale(intersection.geometry.getMaterial().kA)
+                .add(intersection.geometry.getEmission());
     }
+
 
     /**
      * Trace a ray in the scene
