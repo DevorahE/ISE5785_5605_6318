@@ -61,17 +61,23 @@ public abstract class Intersectable {
          */
         public final Point point;
 
+        public final Material material;
+
         /**
          * Constructor to initialize the intersection with a geometry and a point.
          *
          * @param geometry The geometry that the point is on.
          * @param point    The point in 3D space.
          */
-        public Intersection(Geometry geometry, Point point) {
+        public Intersection(Geometry geometry, Point point, Material material) {
             this.geometry = geometry;
             this.point = point;
-        }
 
+            if(material == null)
+                throw new IllegalArgumentException();
+
+            this.material = material;
+        }
 
 
         @Override
