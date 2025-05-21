@@ -1,10 +1,7 @@
 package renderer;
 
 import lighting.LightSource;
-import primitives.Color;
-import primitives.Point;
-import primitives.Ray;
-import primitives.Vector;
+import primitives.*;
 import scene.Scene;
 import geometries.Intersectable. Intersection;
 
@@ -72,5 +69,21 @@ public class SimpleRayTracer extends RayTracerBase{
         intersection.lightSource = light;
         intersection.lightDirection = light.getL(intersection.point);
         intersection.lightNormalDot = alignZero(intersection.lightDirection.dotProduct(intersection.normalIntersection));
-        return intersection.lightNormalDot * intersection.rayNormalDot > 0;}
+        return intersection.lightNormalDot * intersection.rayNormalDot > 0;
+    }
+
+    private Color calcColorLocalEffects(Intersection intersection){
+        return null;
+    }
+
+    private Double3 calcSpecular(Intersection intersection)
+    {
+        return null;
+    }
+
+    private Double3 calcDiffusive(Intersection intersection)
+    {
+        return null;
+    }
+
 }
