@@ -30,7 +30,7 @@ public class SimpleRayTracer extends RayTracerBase{
 
     /**
      * Calculate the color intensity in the scene
-     * @param intersection
+     * @param intersection the intersection point
      * @return the color intensity
      */
     private Color calcColor(Intersection intersection)
@@ -41,11 +41,7 @@ public class SimpleRayTracer extends RayTracerBase{
     }
 
 
-    /**
-     * Trace a ray in the scene
-     * @param ray the ray to trace
-     * @return the color intensity in the point
-     */
+
     @Override
     public Color traceRay(Ray ray) {
         var intersections = scene.geometries.calculateIntersections(ray);

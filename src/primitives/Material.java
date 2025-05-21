@@ -1,5 +1,13 @@
 package primitives;
 
+
+/**
+ * The Material class represents the material properties of a 3D object.
+ * It contains the diffuse coefficient (kA) of the material, which determines
+ * how much light is reflected by the surface.
+ *
+ * @author Devorah Wajs and Guila Czerniewicz
+ */
 public class Material {
 
     /**

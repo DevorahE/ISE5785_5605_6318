@@ -2,11 +2,28 @@ package lighting;
 
 import primitives.*;
 
+/**
+ * PointLight class represents a point light source in the scene.
+ * It extends the Light class and implements the LightSource interface.
+ * @author Devorah Wajs and Guila Czerniewicz
+ */
 public class PointLight extends Light  implements LightSource{
+
+    /**
+     * The position of the light in 3D space.
+     */
     private final Point position;
+
+    /**
+     * The attenuation coefficients for the light.
+     * kC - constant attenuation coefficient
+     * kL - linear attenuation coefficient
+     * kQ - quadratic attenuation coefficient
+     */
     private double kC = 1;
     private double kL = 0;
     private double kQ = 0;
+
     /**
      * Constructor for the Light class.
      * Initializes the intensity of the light.
@@ -34,18 +51,28 @@ public class PointLight extends Light  implements LightSource{
         return p.subtract(position).normalize();
     }
 
+
+    /**
+     * Set the constant attenuation coefficient of the light.
+     */
     public PointLight setKC(double kC)
     {
         this.kC = kC;
         return this;
     }
 
+    /**
+     * Set the linear attenuation coefficient of the light.
+     */
     public PointLight setKL(double kL)
     {
         this.kL = kL;
         return this;
     }
 
+    /**
+     * Set the quadratic attenuation coefficient of the light.
+     */
     public PointLight setKQ(double kQ)
     {
         this.kQ = kQ;

@@ -1,6 +1,5 @@
 package primitives;
 
-import java.util.Objects;
 /**
  * Class Point is the basic class representing a point of geometry
  * 3-Dimensional coordinate system.

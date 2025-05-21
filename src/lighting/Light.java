@@ -2,6 +2,12 @@ package lighting;
 
 import primitives.Color;
 
+/**
+ * The Light class  is an abstract class that serves as a base for different types of light sources.
+ * The class contains the intensity of the light, which is represented by a Color object.
+ *
+ * @author Devorah Wajs and Guila Czerniewicz
+ */
 abstract class Light {
 
     /**
