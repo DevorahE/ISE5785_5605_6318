@@ -10,7 +10,15 @@ import primitives.Vector;
  * @author Devorah Wajs and Guila Czerniewicz
  */
 public class SpotLight extends PointLight{
+    /**
+     * The direction of the light.
+     */
     private final Vector direction;
+    /**
+     * The narrow beam of the light.
+     */
+    private Double narrowBeam = 1d;
+
 
     /**
      * Constructor for the Light class.
@@ -26,21 +34,33 @@ public class SpotLight extends PointLight{
     }
 
     @Override
-    public PointLight setKC(double kC)
+    public SpotLight setKC(double kC)
     {
-        return super.setKC(kC);
+         super.setKC(kC);
+         return this;
     }
 
     @Override
-    public PointLight setKL(double kL)
+    public SpotLight setKl(double kL)
     {
-        return super.setKL(kL);
+         super.setKl(kL);
+         return this;
     }
 
     @Override
-    public PointLight setKQ(double kQ)
+    public SpotLight setKq(double kQ)
     {
-        return super.setKQ(kQ);
+         super.setKq(kQ);
+         return this;
     }
 
+    /**
+     * set the narrow beam of the light
+     * @param narrowBeam the narrow beam of the light
+     * @return the light source
+     */
+    public SpotLight setNarrowBeam(double narrowBeam) {
+        this.narrowBeam = narrowBeam;
+        return this;
+    }
 }
