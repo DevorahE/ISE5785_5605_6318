@@ -30,7 +30,7 @@ public class SimpleRayTracer extends RayTracerBase{
 
     /**
      * Calculate the color intensity in the scene
-     * @param
+     * @param intersection
      * @return the color intensity
      */
     private Color calcColor(Intersection intersection)
