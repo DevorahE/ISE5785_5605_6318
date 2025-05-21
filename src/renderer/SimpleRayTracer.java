@@ -1,13 +1,17 @@
 package renderer;
 
+import lighting.LightSource;
 import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
+import primitives.Vector;
 import scene.Scene;
 import geometries.Intersectable. Intersection;
 
 
 import java.util.List;
+
+import static primitives.Util.alignZero;
 
 
 /**
@@ -49,4 +53,24 @@ public class SimpleRayTracer extends RayTracerBase{
                 : calcColor(ray.findClosestIntersection(intersections));
 
     }
+
+    /**
+     * Preprocess the intersection to calculate the normal and ray-normal dot product
+     * @param intersection the intersection point
+     * @param directionRay the direction of the ray
+     * @return true if the intersection is valid, false otherwise
+     */
+    private boolean preprocessIntersection(Intersection intersection, Vector directionRay) {
+        intersection.directionRay = directionRay;
+        intersection.normalIntersection = intersection.geometry.getNormal(intersection.point);
+        intersection.rayNormalDot = alignZero(intersection.directionRay.dotProduct(intersection.normalIntersection));
+        return intersection.rayNormalDot != 0;
+    }
+
+
+    private boolean setLightSource(Intersection intersection, LightSource light) {
+        intersection.lightSource = light;
+        intersection.lightDirection = light.getL(intersection.point);
+        intersection.lightNormalDot = alignZero(intersection.lightDirection.dotProduct(intersection.normalIntersection));
+        return intersection.lightNormalDot * intersection.rayNormalDot > 0;}
 }

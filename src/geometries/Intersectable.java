@@ -1,4 +1,5 @@
 package geometries;
+import lighting.LightSource;
 import primitives.*;
 import java.util.List;
 import java.util.Objects;
@@ -61,7 +62,41 @@ public abstract class Intersectable {
          */
         public final Point point;
 
+        /**
+         * The material of the geometry at the intersection point.
+         */
         public final Material material;
+
+        /**
+         * Vector representing the direction from the ray origin to the intersection point.
+         */
+        public  Vector directionRay;
+
+        /**
+         * Normal vector to the surface at the intersection point.
+         */
+        public  Vector normalIntersection;
+
+        /**
+         * Dot product between the ray direction and the normal vector.
+         */
+        public double rayNormalDot;
+
+        /**
+         * The light source at the intersection point.
+         */
+        public LightSource lightSource;
+
+        /**
+         * Vector representing the direction from the light source to the intersection point.
+         */
+        public Vector lightDirection;
+
+        /**
+         * Dot product between the source light direction and the normal vector.
+         */
+        public double lightNormalDot;
+
 
         /**
          * Constructor to initialize the intersection with a geometry and a point.
