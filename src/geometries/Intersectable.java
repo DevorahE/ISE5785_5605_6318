@@ -104,13 +104,13 @@ public abstract class Intersectable {
          * @param geometry The geometry that the point is on.
          * @param point    The point in 3D space.
          */
-        public Intersection(Geometry geometry, Point point) throws IllegalArgumentException{
-            if(geometry == null)
-                throw new IllegalArgumentException();
-
+        public Intersection(Geometry geometry, Point point) {
             this.geometry = geometry;
             this.point = point;
-            this.material = geometry.getMaterial();
+            if(geometry != null)
+                this.material = geometry.getMaterial();
+            else
+                this.material = null;
         }
 
 

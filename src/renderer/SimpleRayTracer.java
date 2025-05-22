@@ -9,6 +9,7 @@ import geometries.Intersectable. Intersection;
 import java.util.List;
 
 import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
 
 
 /**
@@ -34,20 +35,24 @@ public class SimpleRayTracer extends RayTracerBase{
      * @param intersection the intersection point
      * @return the color intensity
      */
-    private Color calcColor(Intersection intersection)
-    {
-        return scene.ambientLight.getIntensity()
-                .scale(intersection.geometry.getMaterial().kA)
-                .add(intersection.geometry.getEmission());
+    private Color calcColor(Ray ray, Intersection intersection) {
+
+        if (!preprocessIntersection(intersection, ray.getDirection())) {
+            return Color.BLACK;
+        }
+
+        return intersection.geometry.getEmission()
+                .add(scene.ambientLight.getIntensity().scale(intersection.material.kA))
+                .add(calcColorLocalEffects(intersection));
+
     }
 
 
 
     @Override
     public Color traceRay(Ray ray) {
-        var intersections = scene.geometries.calculateIntersections(ray);
-        return intersections == null ? scene.background
-                : calcColor(ray.findClosestIntersection(intersections));
+        List<Intersection> intersections = scene.geometries.calculateIntersections(ray);
+        return intersections == null ? scene.background : calcColor(ray, ray.findClosestIntersection(intersections));
 
     }
 
@@ -58,10 +63,15 @@ public class SimpleRayTracer extends RayTracerBase{
      * @return true if the intersection is valid, false otherwise
      */
     private boolean preprocessIntersection(Intersection intersection, Vector directionRay) {
+        if (intersection.geometry == null) {
+            return false;
+        }
+
         intersection.directionRay = directionRay;
         intersection.normalIntersection = intersection.geometry.getNormal(intersection.point);
-        intersection.rayNormalDot = alignZero(intersection.directionRay.dotProduct(intersection.normalIntersection));
-        return intersection.rayNormalDot != 0;
+        intersection.rayNormalDot = intersection.normalIntersection.dotProduct(directionRay);
+
+        return !isZero(intersection.rayNormalDot);
     }
 
 
@@ -72,18 +82,59 @@ public class SimpleRayTracer extends RayTracerBase{
         return intersection.lightNormalDot * intersection.rayNormalDot > 0;
     }
 
-    private Color calcColorLocalEffects(Intersection intersection){
-        return null;
+    private Color calcColorLocalEffects(Intersection intersection)
+    {
+        Vector v = intersection.directionRay;
+        Vector n = intersection.geometry.getNormal(intersection.point);
+        double nv = alignZero(n.dotProduct(v));
+        if (nv == 0)
+            return Color.BLACK;
+
+        intersection.directionRay = v.scale(-1);
+        intersection.normalIntersection = n;
+        intersection.rayNormalDot = nv;
+
+        Color color = Color.BLACK;
+
+        if (scene.lights == null || scene.lights.isEmpty()) {
+            return color;
+        }
+
+        for (LightSource lightSource : scene.lights) {
+            if (!setLightSource(intersection, lightSource)) {
+                continue;
+            }
+
+            if (intersection.lightNormalDot * nv > 0) {
+                Color lightIntensity = lightSource.getIntensity(intersection.point);
+                Color diffuse = lightIntensity.scale(calcDiffusive(intersection));
+                Color specular = lightIntensity.scale(calcSpecular(intersection));
+                color = color.add(diffuse, specular);
+            }
+        }
+
+        return color;
+
     }
 
-    private Double3 calcSpecular(Intersection intersection)
-    {
-        return null;
+    /**
+     * Calculates specular reflection component.
+     * @param intersection the intersection information
+     * @return the specular component as a Double3
+     */
+    private Double3 calcSpecular(Intersection intersection) {
+        Vector r = intersection.normalIntersection.scale(2 * intersection.lightNormalDot)
+                .subtract(intersection.lightDirection);
+        double factor = Math.max(0, -intersection.directionRay.dotProduct(r));
+        return intersection.material.kS.scale(Math.pow(factor, intersection.material.nSh));
+
     }
 
-    private Double3 calcDiffusive(Intersection intersection)
-    {
-        return null;
+
+    private Double3 calcDiffusive(Intersection intersection) {
+        double factor = Math.abs(intersection.lightNormalDot);
+        return intersection.material.kD.scale(factor);
     }
+
 
 }
