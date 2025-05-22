@@ -17,7 +17,7 @@ public class SpotLight extends PointLight{
     /**
      * The narrow beam of the light.
      */
-    private Double narrowBeam = 1d;
+    private double narrowBeam = 1;
 
 
     /**

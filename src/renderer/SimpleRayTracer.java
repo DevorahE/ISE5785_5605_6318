@@ -74,6 +74,12 @@ public class SimpleRayTracer extends RayTracerBase{
     }
 
 
+    /**
+     * Set the light source for the intersection
+     * @param intersection the intersection point
+     * @param light the light source
+     * @return true if the light source is valid, false otherwise
+     */
     private boolean setLightSource(Intersection intersection, LightSource light) {
         intersection.lightSource = light;
         intersection.lightDirection = light.getL(intersection.point);
@@ -81,6 +87,12 @@ public class SimpleRayTracer extends RayTracerBase{
         return intersection.lightNormalDot * intersection.rayNormalDot > 0;
     }
 
+
+    /**
+     * Calculate the color based on local effects
+     * @param intersection the intersection point
+     * @return the color intensity
+     */
     private Color calcColorLocalEffects(Intersection intersection)
     {
         Vector v = intersection.directionRay;
@@ -106,9 +118,7 @@ public class SimpleRayTracer extends RayTracerBase{
 
             if (intersection.lightNormalDot * nv > 0) {
                 Color lightIntensity = lightSource.getIntensity(intersection.point);
-//                Color diffuse = lightIntensity.scale(calcDiffusive(intersection));
-//                Color specular = lightIntensity.scale(calcSpecular(intersection));
-//                color = color.add(diffuse, specular);
+
                 Double3 diffusive = calcDiffusive(intersection);
                 Double3 specular = calcSpecular(intersection);
                 color = color.add(lightIntensity.scale(diffusive.add(specular)));
@@ -133,6 +143,11 @@ public class SimpleRayTracer extends RayTracerBase{
     }
 
 
+    /**
+     * Calculates diffusive reflection component.
+     * @param intersection the intersection information
+     * @return the diffusive component as a Double3
+     */
     private Double3 calcDiffusive(Intersection intersection) {
         double factor = Math.abs(intersection.lightNormalDot);
         return intersection.material.kD.scale(factor);

@@ -42,7 +42,11 @@ public abstract class Geometry extends Intersectable {
 
 
 
+    /**
+     * The material of the geometry
+     */
     private Material material = new Material();
+
     /**
      * A function that returns the material of the geometry
      *
