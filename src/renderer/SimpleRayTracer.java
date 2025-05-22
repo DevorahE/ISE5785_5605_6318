@@ -70,7 +70,6 @@ public class SimpleRayTracer extends RayTracerBase{
         intersection.directionRay = directionRay;
         intersection.normalIntersection = intersection.geometry.getNormal(intersection.point);
         intersection.rayNormalDot = intersection.normalIntersection.dotProduct(directionRay);
-
         return !isZero(intersection.rayNormalDot);
     }
 
@@ -107,9 +106,12 @@ public class SimpleRayTracer extends RayTracerBase{
 
             if (intersection.lightNormalDot * nv > 0) {
                 Color lightIntensity = lightSource.getIntensity(intersection.point);
-                Color diffuse = lightIntensity.scale(calcDiffusive(intersection));
-                Color specular = lightIntensity.scale(calcSpecular(intersection));
-                color = color.add(diffuse, specular);
+//                Color diffuse = lightIntensity.scale(calcDiffusive(intersection));
+//                Color specular = lightIntensity.scale(calcSpecular(intersection));
+//                color = color.add(diffuse, specular);
+                Double3 diffusive = calcDiffusive(intersection);
+                Double3 specular = calcSpecular(intersection);
+                color = color.add(lightIntensity.scale(diffusive.add(specular)));
             }
         }
 
