@@ -37,8 +37,8 @@ public class SimpleRayTracer extends RayTracerBase{
     private boolean unshaded(Intersection intersection)
     {
         Vector pointToLight = intersection.lightDirection.scale(-1); // from point to light source
-        Vector epsVector = intersection.normalIntersection.scale(intersection.rayNormalDot < 0 ? DELTA : - DELTA);
-        Point point = intersection.point.add(epsVector);
+        Vector deltaVector = intersection.normalIntersection.scale(intersection.lightNormalDot < 0 ? DELTA : - DELTA);
+        Point point = intersection.point.add(deltaVector);
         Ray shadowRay = new Ray(point, pointToLight);
         var intersections = scene.geometries.findIntersections(shadowRay);
         if (intersections == null) return true;
