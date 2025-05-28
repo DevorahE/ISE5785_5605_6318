@@ -19,6 +19,11 @@ import static primitives.Util.isZero;
  */
 public class SimpleRayTracer extends RayTracerBase{
 
+    /**
+     * A small delta value used to move beginning of the rays
+     */
+    private static final double DELTA = 0.1;
+
 
     /**
      * Constructor for SimpleRayTracer
@@ -29,6 +34,23 @@ public class SimpleRayTracer extends RayTracerBase{
     }
 
 
+    private boolean unshaded(Intersection intersection)
+    {
+        Vector pointToLight = intersection.lightDirection.scale(-1); // from point to light source
+        Vector epsVector = intersection.normalIntersection.scale(intersection.rayNormalDot < 0 ? DELTA : - DELTA);
+        Point point = intersection.point.add(epsVector);
+        Ray shadowRay = new Ray(point, pointToLight);
+        var intersections = scene.geometries.findIntersections(shadowRay);
+        if (intersections == null) return true;
+        double lightDistance = intersection.lightDirection.length();
+
+        for (Point p : intersections) {
+            if (p.distance(point) < lightDistance) {
+                return false; // obstacle before light source
+            }
+        }
+        return true;
+    }
 
     /**
      * Calculate the color intensity in the scene
@@ -116,7 +138,7 @@ public class SimpleRayTracer extends RayTracerBase{
                 continue;
             }
 
-            if (intersection.lightNormalDot * nv > 0) {
+            if (intersection.lightNormalDot * nv > 0 && unshaded(intersection)) {
                 Color lightIntensity = lightSource.getIntensity(intersection.point);
 
                 Double3 diffusive = calcDiffusive(intersection);
