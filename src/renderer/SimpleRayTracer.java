@@ -45,7 +45,7 @@ public class SimpleRayTracer extends RayTracerBase{
         double lightDistance = intersection.lightDirection.length();
 
         for (Point p : intersections) {
-            if (p.distance(point) > lightDistance) {
+            if (p.distance(point) < lightDistance) {
                 return false; // obstacle before light source
             }
         }
