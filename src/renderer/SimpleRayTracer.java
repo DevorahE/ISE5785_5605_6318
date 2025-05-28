@@ -34,22 +34,34 @@ public class SimpleRayTracer extends RayTracerBase{
     }
 
 
-    private boolean unshaded(Intersection intersection)
-    {
-        Vector pointToLight = intersection.lightDirection.scale(-1); // from point to light source
-        Vector deltaVector = intersection.normalIntersection.scale(intersection.lightNormalDot < 0 ? DELTA : - DELTA);
-        Point point = intersection.point.add(deltaVector);
-        Ray shadowRay = new Ray(point, pointToLight);
-        var intersections = scene.geometries.findIntersections(shadowRay);
-        if (intersections == null) return true;
-        double lightDistance = intersection.lightDirection.length();
+//    private boolean unshaded(Intersection intersection)
+//    {
+//        Vector pointToLight = intersection.lightDirection.scale(-1); // from point to light source
+//        Vector deltaVector = intersection.normalIntersection.scale(intersection.lightNormalDot < 0 ? DELTA : - DELTA);
+//        Point point = intersection.point.add(deltaVector);
+//        Ray shadowRay = new Ray(point, pointToLight);
+//        var intersections = scene.geometries.findIntersections(shadowRay);
+//        if (intersections == null) return true;
+//        double lightDistance = intersection.lightDirection.length();
+//
+//        for (Point p : intersections) {
+//            if (p.distance(point) < lightDistance) {
+//                return false; // obstacle before light source
+//            }
+//        }
+//        return true;
+//    }
 
-        for (Point p : intersections) {
-            if (p.distance(point) < lightDistance) {
-                return false; // obstacle before light source
-            }
-        }
-        return true;
+
+    private boolean unshaded(Intersection intersection){
+        Vector lightDirection = intersection.lightDirection.scale(-1); // from point to light source
+        Vector delta = intersection.normalIntersection.scale(intersection.lightNormalDot<0?DELTA:-DELTA);
+        Ray lightRay = new Ray(intersection.point.add(delta), lightDirection);
+        var intersections = scene.geometries.findIntersections(lightRay);
+
+
+        return intersections == null;
+
     }
 
     /**
