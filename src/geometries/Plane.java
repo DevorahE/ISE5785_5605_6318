@@ -2,9 +2,12 @@ package geometries;
 
 import primitives.Point;
 import primitives.Ray;
+import primitives.Util;
 import primitives.Vector;
 
 import java.util.List;
+
+import static primitives.Util.alignZero;
 
 
 /**
@@ -72,23 +75,19 @@ public class Plane extends Geometry{
 
 
     @Override
-    public List<Intersection> calculateIntersectionsHelper(Ray ray){
-        // Check if the ray is parallel to the plane (dot product equals zero)
-        // or if the ray's starting point is the same as the plane's reference point
-        if(ray.getDirection().dotProduct(normal) == 0 || q.equals(ray.getPoint(0))) {
+    public List<Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance) {
+        Vector direction = ray.getDirection();
+        Point p0 = ray.getPoint(0d);
+        // if the ray is parallel to the plane or the ray starts on the plane at the point q
+        if (Util.isZero(direction.dotProduct(normal)) || q.equals(p0))
             return null;
-        }
 
-        // Calculate parameter t using the plane-ray intersection formula
-        double t = normal.dotProduct(q.subtract(ray.getPoint(0))) / normal.dotProduct(ray.getDirection());
+        // calculate the intersection point
+        double t = normal.dotProduct(q.subtract(p0)) / normal.dotProduct(direction);
 
-        // If t is less than or equal to zero, the intersection point is behind the ray origin
-        if (t <= 0) {
-            return null;
-        }
-
-        // Calculate and return the intersection point using the ray equation: p = ray.head + t * ray.direction
-        return List.of(new Intersection(this, ray.getPoint(t)));
+        return Util.alignZero(t) <= 0d || alignZero(t - maxDistance) > 0d ? null : List.of(new Intersection(this, ray.getPoint(t)));
 
     }
+
+
 }

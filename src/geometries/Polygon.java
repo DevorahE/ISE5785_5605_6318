@@ -3,6 +3,7 @@ package geometries;
 import static java.lang.Double.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import static primitives.Util.*;
 import primitives.*;
@@ -83,18 +84,18 @@ public class Polygon extends Geometry {
     public Vector getNormal(Point point) { return plane.getNormal(point); }
 
     @Override
-    public List<Intersection> calculateIntersectionsHelper(Ray ray){
-
+    public List<Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance) {
         // Find and return the intersection points of the ray with the plane
-        List<Point> intersections = plane.findIntersections(ray);
+        List<Point> points = plane.findIntersections(ray);
 
         // If the ray does not intersect the plane or the intersection point is too far, return null
-        if (intersections == null) return null;
+        if (points == null || alignZero(points.getFirst().distanceSquared(ray.getPoint(0d)) - maxDistance) > 0d) return null;
+
         // Initialize a list to hold the normals of the edges of the polygonal base
-        List<Vector> normals = new ArrayList<>(size);
+        List<Vector> normals = new LinkedList<>();
 
         // Get the starting point and direction of the ray
-        final Point startPoint = ray.getPoint(0);
+        final Point startPoint = ray.getPoint(0d);
         final Vector dir = ray.getDirection();
 
         // Calculate the normal vector for each edge of the polygonal base
@@ -108,16 +109,14 @@ public class Polygon extends Geometry {
         normals.add(vertices.getLast().subtract(startPoint).crossProduct(vertices.getFirst().subtract(startPoint)).normalize());
 
         // Determine if the ray direction is consistently on one side of all the polygon's edges
-        boolean allPositive = dir.dotProduct(normals.getFirst()) > 0;
+        boolean allPositive = dir.dotProduct(normals.getFirst()) > 0d;
         for (Vector normal : normals) {
             double s = dir.dotProduct(normal);
             // If the dot product is zero or if it changes sign, the ray does not intersect the polygon's base
-            if (Util.isZero(s) || (s > 0 != allPositive)) {
+            if (Util.isZero(s) || (Util.alignZero(s) > 0d != allPositive)) {
                 return null;
             }
         }
-
-        return List.of(new Intersection(this, intersections.getFirst()));
-
+        return List.of(new Intersection(this, points.getFirst()));
     }
 }

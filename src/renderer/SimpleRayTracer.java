@@ -57,11 +57,8 @@ public class SimpleRayTracer extends RayTracerBase{
         Vector lightDirection = intersection.lightDirection.scale(-1); // from point to light source
         Vector delta = intersection.normalIntersection.scale(intersection.lightNormalDot<0?DELTA:-DELTA);
         Ray lightRay = new Ray(intersection.point.add(delta), lightDirection);
-        var intersections = scene.geometries.findIntersections(lightRay);
-
-
+        List<Intersection> intersections = scene.geometries.calculateIntersections(lightRay, intersection.lightSource.getDistance(intersection.point));
         return intersections == null;
-
     }
 
     /**

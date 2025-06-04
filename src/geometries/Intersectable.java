@@ -30,9 +30,7 @@ public abstract class Intersectable {
      * @param ray
      * @return A list of intersection points between the object and the ray.
      */
-    protected  List<Intersection> calculateIntersectionsHelper(Ray ray) {
-        return null;
-    }
+    protected abstract List<Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance);
 
     /**
      * Finds intersection points between the intersectable object and a given ray.
@@ -41,7 +39,11 @@ public abstract class Intersectable {
      * @return A list of intersection points between the object and the ray.
      */
     public final List<Intersection> calculateIntersections(Ray ray) {
-       return calculateIntersectionsHelper(ray);
+        return calculateIntersections(ray, Double.POSITIVE_INFINITY);
+    }
+
+    public final List<Intersection> calculateIntersections(Ray ray, double maxDistance) {
+        return calculateIntersectionsHelper(ray, maxDistance);
     }
 
 

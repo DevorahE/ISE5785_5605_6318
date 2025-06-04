@@ -2,6 +2,7 @@ package geometries;
 
 import primitives.Point;
 import primitives.Ray;
+import primitives.Util;
 import primitives.Vector;
 
 import java.util.ArrayList;
@@ -41,36 +42,32 @@ public class Sphere extends RadialGeometry{
     }
 
     @Override
-    public List<Intersection> calculateIntersectionsHelper(Ray ray){
-        Vector v = ray.getDirection();
+    public List<Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance) {
         Point p0 = ray.getPoint(0);
+        Vector dir = ray.getDirection();
 
         // if the ray starts at the center of the sphere
+        if (center.equals(p0))
+            return List.of(new Intersection(this, ray.getPoint(radius)));
 
-        if(p0.equals(center))
-            return List.of(new Intersection(this, p0.add(v.scale(radius))));
-
-        Vector u = center.subtract(p0);
-        double tm = alignZero(v.dotProduct(u));
-        double d2 = alignZero(u.lengthSquared() - tm * tm);
-
-        if(alignZero(d2 - radius * radius)>0)
+        Vector u = (center.subtract(p0));
+        double tm = dir.dotProduct(u);
+        double d = Util.alignZero(Math.sqrt(u.lengthSquared() - tm * tm));
+        if (d >= radius)
             return null;
 
-        double th = alignZero(Math.sqrt(radius * radius - d2));
-        double t1 = alignZero(tm - th);
-        double t2 = alignZero(tm + th);
+        double th = Math.sqrt(radius * radius - d * d);
+        double t1 = Util.alignZero(tm - th);
+        double t2 = Util.alignZero(tm + th);
 
-        if(t1 > 0 && t2 > 0)
-            return List.of(
-                    new Intersection(this, ray.getPoint(t1)),
-                    new Intersection(this, ray.getPoint(t2))
-            );
+        // if the ray starts before the sphere
+        if (t1 > 0 && t2 > 0 && alignZero(t1 - maxDistance) <= 0d && alignZero(t2 - maxDistance) <= 0d)
+            return List.of(new Intersection(this,ray.getPoint(t1)),new Intersection(this, ray.getPoint(t2)));
 
-        if(t1 > 0)
+        // if the ray starts inside the sphere
+        if (t1 > 0 && alignZero(t1 - maxDistance) <= 0d)
             return List.of(new Intersection(this,ray.getPoint(t1)));
-
-        if(t2 > 0)
+        if (t2 > 0 && alignZero(t2 - maxDistance) <= 0d)
             return List.of(new Intersection(this,ray.getPoint(t2)));
 
         return null;

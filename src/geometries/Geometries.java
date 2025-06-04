@@ -37,27 +37,40 @@ public class Geometries extends Intersectable{
         Collections.addAll(this.geometries, geometries);
     }
 
-    /**
-     * A function that receives a foundation and returns all bodies that the foundation
-     *
-     * @param ray
-     * @return a list of points intersections
-     */
+//    /**
+//     * A function that receives a foundation and returns all bodies that the foundation
+//     *
+//     * @param ray
+//     * @return a list of points intersections
+//     */
+//    @Override
+//    public List<Intersection> calculateIntersectionsHelper(Ray ray) {
+//
+//            List<Intersection> intersections = null;
+//            for(Intersectable geo : geometries)
+//            {
+//                List<Intersection> geometryIntersection = geo.calculateIntersectionsHelper(ray);
+//                if(geometryIntersection!=null)
+//                {
+//                    if(intersections==null)
+//                        intersections=new LinkedList<>();
+//                    intersections.addAll(geometryIntersection);
+//                }
+//            }
+//            return intersections;
+//    }
+
     @Override
-    public List<Intersection> calculateIntersectionsHelper(Ray ray) {
-
-            List<Intersection> intersections = null;
-            for(Intersectable geo : geometries)
-            {
-                List<Intersection> geometryIntersection = geo.calculateIntersectionsHelper(ray);
-                if(geometryIntersection!=null)
-                {
-                    if(intersections==null)
-                        intersections=new LinkedList<>();
-                    intersections.addAll(geometryIntersection);
-                }
+    protected List<Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance) {
+        List<Intersection> intersections = null;
+        for (Intersectable geometry : geometries) {
+            List<Intersection> geometryIntersections = geometry.calculateIntersectionsHelper(ray, maxDistance);
+            if (geometryIntersections != null) {
+                if (intersections == null)
+                    intersections = new LinkedList<>();
+                intersections.addAll(geometryIntersections);
             }
-            return intersections;
+        }
+        return intersections;
     }
-
 }
