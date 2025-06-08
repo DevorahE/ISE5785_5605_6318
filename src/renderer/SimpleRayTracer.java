@@ -93,7 +93,7 @@ public class SimpleRayTracer extends RayTracerBase{
      * @return the color intensity
      */
     private Color calcColor(Intersection intersection, int level, Double3 k){
-        Color color = calcColorLocalEffects(intersection);
+        Color color = calcColorLocalEffects(intersection,k);
         return 1 == level ? color : color.add(calcGlobalEffects(intersection, level, k));
     }
 
@@ -132,13 +132,13 @@ public class SimpleRayTracer extends RayTracerBase{
     }
 
 
-//    /**
-//     * Calculates the transparency factor for the intersection point.
-//     * This is done by casting a shadow ray and checking for intersections with other geometries.
-//     *
-//     * @param intersection the intersection object
-//     * @return the transparency factor as Double3
-//     */
+    /**
+     * Calculates the transparency factor for the intersection point.
+     * This is done by casting a shadow ray and checking for intersections with other geometries.
+     *
+     * @param intersection the intersection object
+     * @return the transparency factor as Double3
+     */
 //    private Double3 transparency(Intersection intersection) {
 //        Vector lightDirection = intersection.lightDirection.scale(-1);
 //        Vector delta = intersection.normalIntersection.scale(intersection.rayNormalDot < 0 ? DELTA : -DELTA);
@@ -159,6 +159,62 @@ public class SimpleRayTracer extends RayTracerBase{
 //
 //        return ktr;
 //    }
+
+//    private Double3 transparency(Intersection intersection) {
+//        // Direction vers la lumière
+//        Vector lightDirection = intersection.lightDirection.scale(-1);
+//
+//        // Signe de dot produit pour savoir de quel côté décaler
+//        double nv = intersection.normalIntersection.dotProduct(lightDirection);
+//        Vector delta = intersection.normalIntersection.scale(nv < 0 ? -DELTA : DELTA);
+//
+//        // Rayon d’ombre légèrement décalé pour éviter auto-intersection
+//        Ray shadowRay = new Ray(intersection.point.add(delta), lightDirection, intersection.normalIntersection);
+//
+//        // Récupération des intersections avec limite de distance à la source
+//        double maxDistance = intersection.lightSource.getDistance(intersection.point);
+//        List<Intersection> shadowIntersections = scene.geometries.calculateIntersections(shadowRay, maxDistance);
+//
+//        // Si aucune intersection => pas d’obstacle => lumière non atténuée
+//        if (shadowIntersections == null) return Double3.ONE;
+//
+//        // Produit cumulatif de transparence
+//        Double3 ktr = Double3.ONE;
+//
+//        // Parcours des objets sur le chemin vers la lumière
+//        for (Intersection hit : shadowIntersections) {
+//            // Si l’objet est totalement opaque => aucune lumière ne passe
+//            if (hit.geometry.getMaterial().kT.equals(Double3.ZERO)) {
+//                return Double3.ZERO;
+//            }
+//
+//            // Atténuation selon la transparence kT de chaque objet
+//            ktr = ktr.product(hit.geometry.getMaterial().kT);
+//
+//            // Si la lumière est totalement absorbée, inutile de continuer
+//            if (ktr.lowerThan(MIN_CALC_COLOR_K)) {
+//                return Double3.ZERO;
+//            }
+//        }
+//
+//        return ktr;
+//    }
+
+    private Double3 transparency(Intersection intersection) {
+        Vector pointToLight = intersection.lightDirection.scale(-1);
+        Ray shadowRay = new Ray(intersection.point, pointToLight, intersection.normalIntersection);
+        var intersections = scene.geometries.calculateIntersections(
+                shadowRay,
+                intersection.lightSource.getDistance(intersection.point));
+        if (intersections == null || intersections.isEmpty()) {
+            return Double3.ONE;
+        }
+        Double3 ktr = Double3.ONE;
+        for (Intersection shadowIntersection : intersections) {
+            ktr = ktr.product(shadowIntersection.material.kT);
+        }
+        return ktr;
+    }
 
 
 
@@ -261,40 +317,79 @@ public class SimpleRayTracer extends RayTracerBase{
      * @param intersection the intersection point
      * @return the color intensity
      */
-    private Color calcColorLocalEffects(Intersection intersection) {
-        if (intersection == null) {
-            return scene.background;
-        }
+//    private Color calcColorLocalEffects(Intersection intersection) {
+//        if (intersection == null) {
+//            return scene.background;
+//        }
+//
+//        Color color = intersection.geometry.getEmission();
+//        Vector v = intersection.directionRay;
+//        Vector n = intersection.geometry.getNormal(intersection.point);
+//        double nv = alignZero(n.dotProduct(v));
+//        if (nv == 0) return color;
+//
+//        intersection.directionRay = v.scale(-1);
+//        intersection.normalIntersection = n;
+//        intersection.rayNormalDot = nv;;
+//
+//        if (scene.lights == null || scene.lights.isEmpty()) {
+//            return color;
+//        }
+//
+//        for (LightSource lightSource : scene.lights) {
+//            if (!setLightSource(intersection, lightSource)) continue;
+//
+//            if (intersection.lightNormalDot * nv > 0 && unshaded(intersection, lightSource)) {
+//                Color lightIntensity = lightSource.getIntensity(intersection.point);
+//                Double3 diffusive = calcDiffusive(intersection);
+//                Double3 specular = calcSpecular(intersection);
+//
+//                color = color.add(lightIntensity.scale(diffusive.add(specular)));
+//            }
+//        }
+//
+//        return color;
+//    }
+//    private Color calcColorLocalEffects(Intersection intersection) {
+//
+//        if (intersection == null) {
+//            return scene.background;
+//        }
+//        Material material = intersection.material;
+//        Color color = intersection.geometry.getEmission();
+//        for (LightSource lightSource : scene.lights) {
+//            {
+//                if(!setLightSource(intersection, lightSource)) {/// /////&&
+//                    continue;
+//                }
+//                Double3 ktr = transparency(intersection);
+//                if (ktr.lowerThan(MIN_CALC_COLOR_K)) continue;
+//                // Compute light intensity at the intersection point
+//                Color iL = lightSource.getIntensity(intersection.point).scale(ktr);
+//                // Add contribution from diffusive and specular effects
+//                color = color.add(iL.scale(calcDiffusive(intersection))).add(iL.scale(calcSpecular(intersection)));
+//            }
+//        }
+//        return color;
+//    }
 
+    private Color calcColorLocalEffects(Intersection intersection, Double3 k) {
         Color color = intersection.geometry.getEmission();
-        Vector v = intersection.directionRay;
-        Vector n = intersection.geometry.getNormal(intersection.point);
-        double nv = alignZero(n.dotProduct(v));
-        if (nv == 0) return color;
-
-        intersection.directionRay = v.scale(-1);
-        intersection.normalIntersection = n;
-        intersection.rayNormalDot = nv;;
-
-        if (scene.lights == null || scene.lights.isEmpty()) {
-            return color;
-        }
-
         for (LightSource lightSource : scene.lights) {
-            if (!setLightSource(intersection, lightSource)) continue;
-
-            if (intersection.lightNormalDot * nv > 0 && unshaded(intersection, lightSource)) {
-                Color lightIntensity = lightSource.getIntensity(intersection.point);
-                Double3 diffusive = calcDiffusive(intersection);
-                Double3 specular = calcSpecular(intersection);
-
-                color = color.add(lightIntensity.scale(diffusive.add(specular)));
+            if (!setLightSource(intersection, lightSource)) {
+                continue;
+            }
+            Double3 ktr = transparency(intersection);
+            if (!ktr.product(k).lowerThan(MIN_CALC_COLOR_K)) {
+                color = color.add(
+                        lightSource.getIntensity(intersection.point).scale(ktr).scale(
+                                calcDiffusive(intersection).add(calcSpecular(intersection))
+                        )
+                );
             }
         }
-
         return color;
     }
-
     /**
      * Calculates specular reflection component.
      * @param intersection the intersection information

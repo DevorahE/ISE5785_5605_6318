@@ -64,7 +64,7 @@ public class Geometries extends Intersectable{
     protected List<Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance) {
         List<Intersection> intersections = null;
         for (Intersectable geometry : geometries) {
-            List<Intersection> geometryIntersections = geometry.calculateIntersectionsHelper(ray, maxDistance);
+            List<Intersection> geometryIntersections = geometry.calculateIntersections(ray, maxDistance);
             if (geometryIntersections != null) {
                 if (intersections == null)
                     intersections = new LinkedList<>();
