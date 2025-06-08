@@ -32,6 +32,50 @@ public class Material {
 
 
     /**
+     * kt is the transparency factor
+     */
+    public Double3 kT = Double3.ZERO;
+
+    /**
+     * kr is the reflection factor
+     */
+    public Double3 kR = Double3.ZERO;
+
+
+    /**
+     * Set the transparency factor of the material with double3
+     */
+    public Material setKt(Double3 kT) {
+        this.kT = kT;
+        return this;
+    }
+    /**
+     * Set the transparency factor of the material with double
+     */
+    public Material setKt(double kT) {
+        this.kT = new Double3(kT);
+        return this;
+    }
+
+    /**
+     * Set the reflection factor of the material with double
+     */
+    public Material setKr(double kR) {
+        this.kR = new Double3(kR);
+        return this;
+    }
+
+    /**
+     * Set the reflection factor of the material with double3
+     */
+    public Material setKr(Double3 kR) {
+        this.kR = kR;
+        return this;
+    }
+
+
+
+    /**
      * Set the diffuse coefficient of the material with double3
      */
     public Material setkA(Double3 kA) {

@@ -23,6 +23,12 @@ public class Ray {
     private final Vector direction;
 
     /**
+     * A small delta value used to move beginning of the rays
+     */
+    private static final double DELTA = 0.1;
+
+
+    /**
      * Constructor to initialize Ray based on point and a vector
      *
      * @param head      - Starting point - head of the ray
@@ -32,6 +38,26 @@ public class Ray {
         this.head = head;
         this.direction = direction.normalize();
     }
+
+    /**
+     * Constructor to initialize Ray based on point, direction vector, and a normal vector.
+     *
+     * @param head    - Starting point - head of the ray
+     * @param direction - Direction vector of the ray
+     * @param normal  - Normal vector to adjust the head position
+     */
+    public Ray(Point head, Vector direction, Vector normal) {
+        this.direction = direction.normalize();
+        double nv = normal.dotProduct(this.direction);
+
+        // Add a small delta to the ray's origin to avoid floating-point precision issues
+        if (!Util.isZero(nv)) {
+            this.head = head.add(normal.scale(nv > 0 ? DELTA : -DELTA));
+        } else {
+            this.head = head;
+        }
+    }
+
 
     @Override
     public String toString() {
@@ -78,7 +104,12 @@ public class Ray {
         return listPoints == null ? null
                 : findClosestIntersection(listPoints.stream().map(p -> new Intersection(null, p)).toList()).point;
     }
-
+    /**
+     * Finds the closest intersection point from a list of intersections.
+     *
+     * @param intersections the list of intersections to search for the closest one
+     * @return the closest intersection point, or null if the list is empty or null
+     */
     public Intersection findClosestIntersection(List<Intersection> intersections)
     {
         if (intersections == null || intersections.isEmpty()) {
