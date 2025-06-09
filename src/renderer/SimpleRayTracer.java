@@ -5,10 +5,13 @@ import lighting.LightSource;
 import primitives.*;
 import scene.Scene;
 
+
 /**
  * A basic ray tracer for evaluating rays in a scene.
  *
  * Provides a simple implementation for determining the color along a ray.
+ *
+ * @author Devorah Wajs and Guila Czerniewicz
  */
 public class SimpleRayTracer extends RayTracerBase {
 

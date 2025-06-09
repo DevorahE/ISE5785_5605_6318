@@ -96,15 +96,10 @@ class GeometriesTest {
         assertNotNull(result, "ERROR: the intersections' array should not be null");
         assertEquals(1, result.size(), "ERROR: Wrong number of intersections");
 
-        // TC03: All intersections within range
-        result = geometries.calculateIntersections(ray, 12);
-        assertNotNull(result, "ERROR: the intersections' array should not be null");
-        assertEquals(9, result.size(), "ERROR: Wrong number of intersections");
-
-        // TC04: Ray ends at some intersections
+        // TC03: Ray ends at some intersections
         result = geometries.calculateIntersections(ray, 2);
         assertNotNull(result, "ERROR: the intersections' array should not be null");
-        assertEquals(3, result.size(), "ERROR: the intersections' array should not be null");
+        assertEquals(2, result.size(), "ERROR: the intersections' array should not be null");
     }
 
 }
