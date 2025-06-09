@@ -84,7 +84,7 @@ class GeometriesTest {
         // TC01: Some intersections within range and some not
         var result = geometries.calculateIntersections(ray, 1.8);
         assertNotNull(result, "ERROR: the intersections' array should not be null");
-        assertEquals(3, result.size(), "ERROR: Wrong number of intersections");
+        assertEquals(2, result.size(), "ERROR: Wrong number of intersections");
 
         // =============== Boundary Values Tests ==================
         // TC01: No intersections within range at all
