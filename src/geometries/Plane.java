@@ -76,17 +76,18 @@ public class Plane extends Geometry{
 
     @Override
     public List<Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance) {
-        Vector direction = ray.getDirection();
-        Point p0 = ray.getPoint(0d);
-        // if the ray is parallel to the plane or the ray starts on the plane at the point q
-        if (Util.isZero(direction.dotProduct(normal)) || q.equals(p0))
+        Point head = ray.getPoint(0);
+        if (q.equals(head))
             return null;
-
-        // calculate the intersection point
-        double t = normal.dotProduct(q.subtract(p0)) / normal.dotProduct(direction);
-
-        return Util.alignZero(t) <= 0d || alignZero(t - maxDistance) > 0d ? null : List.of(new Intersection(this, ray.getPoint(t)));
-
+        Vector u = q.subtract(head);
+        double nominator = u.dotProduct(normal);
+        double denominator = normal.dotProduct(ray.getDirection());
+        if (Util.isZero(denominator))
+            return null;
+        double t = Util.alignZero(nominator / denominator);
+        if (t > 0 && Util.alignZero(t - maxDistance) < 0)
+            return List.of(new Intersection(this, ray.getPoint(t)));
+        return null;
     }
 
 

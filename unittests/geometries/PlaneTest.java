@@ -141,5 +141,35 @@ class PlaneTest {
         // TC09: Test that the ray starts at the reference point of the plane
         assertNull(plane.findIntersections(new Ray(p3, v1)), "ERROR: Failed to find the intersection point when the ray start at the plane at the point that sent to the constructor");
     }
+    /**
+     * Test method for {@link Plane#calculateIntersections(Ray, double)}
+     */
+    @Test
+    void calculateIntersections() {
+        Point point1 = new Point(1, 6, 3);
+        Point point2 = new Point(4, 5, 2);
+        Point point3 = new Point(3, 6, 9);
+        Plane plane = new Plane(point1, point2, point3);
+        // ============ Equivalence Partitions Tests ==============
+        // Test Case 01 - Ray starts before plane, and maxDistance is smaller than the distance between ray head and plane
+        Ray ray = new Ray(new Point(0, -10, 0), new Vector(-5, 5, -2));
+        assertNull(plane.calculateIntersections(ray, 1),
+                "Ray's intersection point is greater than maxDistance");
 
+        // Test Case 02 - Ray starts before plane, and maxDistance is greater than the distance between ray head and plane
+        var result = plane.calculateIntersections(ray, 100);
+        assertNotNull(result, "ERROR: the intersections' array should not be null");
+        assertEquals(1, result.size(), "ERROR: Wrong number of intersections");
+
+        // Test Case 03 - Ray starts after plane
+        ray = new Ray(new Point(0, -10, 0), new Vector(5, -5, 2));
+        assertNull(plane.calculateIntersections(ray, 1),
+                "ERROR: Wrong number of intersections");
+
+        // =============== Boundary Values Tests ==================
+        // Test Case 01 - Ray ends at plane
+        ray = new Ray(new Point(0, -10, 0), new Vector(-2.381818181818182, 16.727272727272727, 0.127272727272727));
+        assertNull(plane.calculateIntersections(ray, 16.896476232957838),
+                "ERROR: Wrong number of intersections");
+    }
 }

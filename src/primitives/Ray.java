@@ -85,7 +85,11 @@ public class Ray {
         // if t is zero, return the head point
         if (Util.isZero(t))
             return head;
-        return head.add(direction.scale(t));
+        try {
+            return head.add(direction.scale(t));
+        } catch (IllegalArgumentException e) {
+            return head;
+        }
     }
 
 
@@ -119,9 +123,9 @@ public class Ray {
         Intersection closest = null;
         double minDistance = Double.POSITIVE_INFINITY;
         for (Intersection intersection : intersections) {
-            double distance = head.distance(intersection.point);
-            if (distance < minDistance) {
-                minDistance = distance;
+            double distanceSquared = head.distanceSquared(intersection.point);
+            if (distanceSquared < minDistance) {
+                minDistance = distanceSquared;
                 closest = intersection;
             }
         }

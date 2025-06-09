@@ -133,6 +133,58 @@ class SphereTest {
         assertEquals(List.of(p2), sphere.findIntersections(new Ray(p5, v3)),
                 "ERROR: Failed to find the intersection point when the ray start in the sphere and doesn't reach the middle of the sphere");
     }
+    /**
+     * Test method for {@link Sphere#calculateIntersections(Ray, double)}
+     */
+    @Test
+    void calculateIntersections() {
+        final Sphere sphere = new Sphere(3, Point.ZERO);
+        // A vector used in some test cases to (1,0,0)
+        Vector v100 = new Vector(1, 0, 0);
 
+        // ============ Equivalence Partitions Tests ==============
+        // Test Case 01 - Ray starts before sphere, and maxDistance is smaller than the distance between ray head and sphere
+        Ray ray = new Ray(new Point(-6, 2.5, 0), v100);
+        assertNull(sphere.calculateIntersections(ray, 3.5), "Ray's intersection point is greater than maxDistance");
+
+        // TC02: Ray starts before the sphere and ends inside it
+        ray = new Ray(new Point(-4, 1.5, 0), v100);
+        var result = sphere.calculateIntersections(ray, 3.5);
+        assertNotNull(result, "ERROR: the intersections' array should not be null");
+        assertEquals(1, result.size(), "ERROR: Wrong number of intersections");
+
+        //TC03: Ray starts and ends inside the sphere
+        ray = new Ray(new Point(-2, 0.5, 0), v100);
+        assertNull(sphere.calculateIntersections(ray, 3.5), "ray starts and stops inside the sphere");
+
+        // TC04: Ray starts inside the sphere and ends after it
+        result = sphere.calculateIntersections(new Ray(new Point(2, -1.5, 0), v100), 3.5);
+        assertNotNull(result, "ERROR: the intersections' array should not be null");
+        assertEquals(1, result.size(), "ERROR: Wrong number of intersections");
+
+        // TC05: Ray starts after sphere
+        ray = new Ray(new Point(4, -2.5, 0), v100);
+        assertNull(sphere.calculateIntersections(ray, 3.5), "ray starts after the sphere");
+
+        // TC06: Ray crosses the sphere, starts before it and ends after it
+        ray = new Ray(new Point(-4, 1.5, 0), v100);
+        result = sphere.calculateIntersections(ray, 8);
+        assertNotNull(result, "ERROR: the intersections' array should not be null");
+        assertEquals(2, result.size(), "ERROR: Wrong number of intersections");
+
+        // =============== Boundary Values Tests ==================
+        // TC01: Ray starts before the sphere and ends at the first intersection point
+        result = sphere.calculateIntersections(new Ray(new Point(-4, 0, 0), v100), 1);
+        assertNull(result, "ERROR: the intersections' array should not be null");
+
+        // TC02: Ray starts before the sphere and ends at the second intersection point
+        result = sphere.calculateIntersections(new Ray(new Point(-4, 0, 0), v100), 7);
+        assertNotNull(result, "ERROR: the intersections' array should not be null");
+        assertEquals(1, result.size(), "ERROR: Wrong number of intersections");
+
+        // TC03: Ray starts inside the sphere and ends at the intersection point
+        result = sphere.calculateIntersections(new Ray(new Point(-2, 0, 0), v100), 5);
+        assertNull(result, "ERROR: the intersections' array should not be null");
+    }
 
 }

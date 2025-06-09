@@ -24,56 +24,30 @@ public class Triangle extends Polygon{
 
     @Override
     public List<Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance) {
-        Point p1 = vertices.get(0);
-        Point p2 = vertices.get(1);
-        Point p3 = vertices.get(2);
+        var intersections = plane.calculateIntersections(ray, maxDistance);
+        if (intersections == null || intersections.getFirst().point.equals(vertices.get(0)))
+            return null;
 
-        Vector ab = p2.subtract(p1);
-        Vector ac = p3.subtract(p1);
-        Vector n = ab.crossProduct(ac);
+        Point intersect = intersections.getFirst().point;
 
-        double nd = n.dotProduct(ray.getDirection());
-        if (Util.isZero(nd)) {
-            return null; // The ray is parallel to the plane of the triangle
-        }
+        Vector v1 = vertices.get(2).subtract(vertices.get(0));
+        Vector v2 = vertices.get(1).subtract(vertices.get(0));
+        Vector v3 = intersect.subtract(vertices.get(0));
 
-        double t = Util.alignZero(n.dotProduct(p1.subtract(ray.getPoint(0d))) / nd);
-        if (t < 0d) {
-            return null; // The intersection is behind the ray's origin
-        }
+        double dot00 = v1.dotProduct(v1);
+        double dot01 = v1.dotProduct(v2);
+        double dot02 = v1.dotProduct(v3);
+        double dot11 = v2.dotProduct(v2);
+        double dot12 = v2.dotProduct(v3);
 
-        Point p = ray.getPoint(t);
-        if (p.equals(p1) || p.equals(p2) || p.equals(p3)) {
-            return null; // The intersection point is one of the triangle's vertices
-        }
+        double denominator = dot00 * dot11 - dot01 * dot01;
 
-        /*
-         * Compute barycentric coordinates:
-         * to use the barycentric coordinates to determine if a point is inside a triangle,
-         * we need to compute the barycentric coordinates of the point with respect to the triangle.
-         * after some proofs, we found the matrix equation:
-         *
-         * |d00  d01| |v|= |d02|
-         * |d01  d11| |v|= |d12|
-         *
-         * so we can use Kermer's rule to solve the equations and found v, u and w
-         */
-        Vector ap = p.subtract(p1);
-        double dot00 = ab.dotProduct(ab);
-        double dot01 = ab.dotProduct(ac);
-        double dot02 = ab.dotProduct(ap);
-        double dot11 = ac.dotProduct(ac);
-        double dot12 = ac.dotProduct(ap);
+        double u = alignZero((dot11 * dot02 - dot01 * dot12) / denominator);
+        double v = alignZero((dot00 * dot12 - dot01 * dot02) / denominator);
 
-        double invDenom = Util.alignZero(1d / (dot00 * dot11 - dot01 * dot01));
-        double u = Util.alignZero((dot11 * dot02 - dot01 * dot12) * invDenom);
-        double v = Util.alignZero((dot00 * dot12 - dot01 * dot02) * invDenom);
-        double w = Util.alignZero(1d - u - v);
+        if ((u > 0) && (v > 0) && (u + v < 1))
+            return List.of(new Intersection(this, intersect));
 
-        // Check if the point is inside the triangle
-        if (u > 0d && v > 0d && w > 0d && Util.alignZero(ray.getPoint(0).distanceSquared(p)) <= maxDistance* maxDistance) {
-            return List.of(new Intersection(this, p));
-        }
         return null;
     }
 }

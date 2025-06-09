@@ -85,38 +85,38 @@ public class Polygon extends Geometry {
 
     @Override
     public List<Intersection> calculateIntersectionsHelper(Ray ray, double maxDistance) {
-        // Find and return the intersection points of the ray with the plane
-        List<Point> points = plane.findIntersections(ray);
-
-        // If the ray does not intersect the plane or the intersection point is too far, return null
-        if (points == null || alignZero(points.getFirst().distanceSquared(ray.getPoint(0d)) - maxDistance) > 0d) return null;
-
-        // Initialize a list to hold the normals of the edges of the polygonal base
-        List<Vector> normals = new LinkedList<>();
-
-        // Get the starting point and direction of the ray
-        final Point startPoint = ray.getPoint(0d);
-        final Vector dir = ray.getDirection();
-
-        // Calculate the normal vector for each edge of the polygonal base
-        Vector v1 = vertices.getFirst().subtract(startPoint);
-        for (Point p : vertices.subList(1, size)) {
-            Vector v2 = p.subtract(startPoint);
-            normals.add(v1.crossProduct(v2).normalize());
-            v1 = v2;
+        List<Intersection> planeIntersections = plane.calculateIntersections(ray, maxDistance);
+        if (planeIntersections == null) {
+            return null;
         }
-        // Add the normal for the edge connecting the last vertex to the first vertex
-        normals.add(vertices.getLast().subtract(startPoint).crossProduct(vertices.getFirst().subtract(startPoint)).normalize());
 
-        // Determine if the ray direction is consistently on one side of all the polygon's edges
-        boolean allPositive = dir.dotProduct(normals.getFirst()) > 0d;
-        for (Vector normal : normals) {
-            double s = dir.dotProduct(normal);
-            // If the dot product is zero or if it changes sign, the ray does not intersect the polygon's base
-            if (Util.isZero(s) || (Util.alignZero(s) > 0d != allPositive)) {
-                return null;
-            }
+        Point rayHead = ray.getPoint(0);
+        Vector rayDirection = ray.getDirection();
+
+        int size = vertices.size();
+        Vector[] normals = new Vector[size];
+
+        for (int i = 0; i < size; i++) {
+            Point pi = vertices.get(i);
+            Point pj = vertices.get((i + 1) % size);
+
+            Vector vi = pi.subtract(rayHead);
+            Vector vj = pj.subtract(rayHead);
+
+            normals[i] = vi.crossProduct(vj).normalize();
         }
-        return List.of(new Intersection(this, points.getFirst()));
+
+        double dotProduct = alignZero(normals[0].dotProduct(rayDirection));
+        if (dotProduct == 0)
+            return null;
+
+        boolean isPositive = dotProduct > 0;
+
+        for (int i = 1; i < size; i++) {
+            dotProduct = alignZero(normals[i].dotProduct(rayDirection));
+            if (dotProduct == 0 || (dotProduct > 0) != isPositive)
+                return null;  // Return null if dotProduct is zero or signs don't match
+        }
+        return List.of(new Intersection(this, planeIntersections.getFirst().point));
     }
 }

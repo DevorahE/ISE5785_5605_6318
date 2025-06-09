@@ -83,4 +83,34 @@ class TriangleTest {
                         new Ray(new Point(-1, 0, -1), new Vector(0, 0, 1))),
                 "ERROR: Failed to find the intersection point when the intersection point is outside the triangle and on edge's continuation");
     }
+
+    /**
+     * Test method for {@link Triangle#calculateIntersections(Ray, double)}
+     */
+    @Test
+    void calculateIntersections() {
+        // ============ Equivalence Partitions Tests ==============
+        final Triangle triangle = new Triangle(new Point(1, 0, 0), new Point(0, 1, 0), new Point(0, 0, 0));
+
+        // Test Case 01 - Ray starts before triangle, and maxDistance is smaller than the distance between ray head and triangle
+        Ray ray = new Ray(new Point(0.3, 0.3, 2), new Vector(0, 0, -1));
+        assertNull(triangle.calculateIntersections(ray, 1),
+                "ERROR: Ray's intersection point is greater than maxDistance");
+
+        // Test Case 02 - Ray starts before triangle, and maxDistance is greater than the distance between ray head and triangle
+        var result = triangle.calculateIntersections(ray, 3);
+        assertNotNull(result, "ERROR: the intersections' array should not be null");
+        assertEquals(1, result.size(), "ERROR: Wrong number of intersections");
+
+        // Test Case 03 - Ray starts after triangle
+        ray = new Ray(new Point(0.3, 0.3, -1), new Vector(0, 0, -1));
+        assertNull(triangle.calculateIntersections(ray, 1),
+                "ERROR: Wrong number of intersections");
+
+        // =============== Boundary Values Tests ==================
+        // Test Case 01 - Ray ends at triangle
+        ray = new Ray(new Point(0.3, 0.3, 1), new Vector(0, 0, -1));
+        assertNull(triangle.calculateIntersections(ray, 1),
+                "ERROR: Wrong number of intersections");
+    }
 }

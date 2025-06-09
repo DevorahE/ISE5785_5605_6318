@@ -1,8 +1,9 @@
 package lighting;
 
-import primitives.Color;
-import primitives.Point;
-import primitives.Vector;
+import primitives.*;
+
+import static java.lang.Math.pow;
+import static primitives.Util.alignZero;
 
 /**
  * SpotLight class represents a spotlight in the scene.
@@ -39,6 +40,7 @@ public class SpotLight extends PointLight{
         double factor = Math.max(0, direction.dotProduct(getL(p)));
         factor = Math.pow(factor, narrowBeam);
         return intensity.scale(factor);
+
     }
 
     @Override
