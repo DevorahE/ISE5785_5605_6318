@@ -29,10 +29,8 @@ public class Camera implements Cloneable {
 
     /**
      * Renders the image by casting rays through each pixel of the view plane.
-     * This method is currently not implemented and throws an UnsupportedOperationException.
      *
      * @return the Camera instance for method chaining
-     * @throws UnsupportedOperationException if the method is called
      */
     public Camera renderImage()
     {
@@ -66,7 +64,6 @@ public class Camera implements Cloneable {
         return this ;
     }
 
-
     /**
      * Writes the rendered image to a file.
      * @param nameFile
@@ -77,7 +74,6 @@ public class Camera implements Cloneable {
         imageWriter.writeToImage(nameFile);
         return this ;
     }
-
 
     /**
      * Casts a ray through a specific pixel on the view plane and writes the color to the image.
@@ -102,7 +98,6 @@ public class Camera implements Cloneable {
      * @return the constructed {@link Ray}.
      */
     public Ray constructRay(int nX, int nY, int j, int i) {
-
         // Calculate the center point of the view plane
         Point pC = location.add(vTo.scale(distance));
 
@@ -130,56 +125,16 @@ public class Camera implements Cloneable {
 
         // Return the constructed ray
         return new Ray(location, vIJ);
-
-
     }
 
-    /**
-     * Returns the location of the camera in the 3D space.
-     *
-     * @return the location of the camera.
-     */
-    public Point getLocation() {
-        return location;
-    }
-
-    public Vector getvTo() {
-        return vTo;
-    }
-
-    public Vector getvUp() {
-        return vUp;
-    }
-
-    public Vector getvRight() {
-        return vRight;
-    }
-    /**
-     * Returns the width of the view plane.
-     *
-     * @return the width of the view plane.
-     */
-    public double getWidth() {
-        return width;
-    }
-
-    /**
-     * Returns the height of the view plane.
-     *
-     * @return the height of the view plane.
-     */
-    public double getHeight() {
-        return height;
-    }
-
-    /**
-     * Returns the distance of the camera to the view plane.
-     *
-     * @return the distance to the view plane.
-     */
-    public double getDistance() {
-        return distance;
-    }
+    // Getters
+    public Point getLocation() { return location; }
+    public Vector getvTo() { return vTo; }
+    public Vector getvUp() { return vUp; }
+    public Vector getvRight() { return vRight; }
+    public double getWidth() { return width; }
+    public double getHeight() { return height; }
+    public double getDistance() { return distance; }
 
     private Camera(){
         // Private constructor to prevent instantiation
@@ -195,38 +150,31 @@ public class Camera implements Cloneable {
     }
 
     /**
-     * A builder class for the Camera class.
+     * A builder class for the Camera class with support for transformations.
      */
     public static class Builder {
-        /// initialization of camera here; no need of constructor
         private final Camera camera = new Camera();
 
+        // Transformation intermediate data
+        private Point baseLocation = null;
+        private Vector baseVTo = null;
+        private Vector baseVUp = null;
+        private boolean hasTransformations = false;
 
         /**
          * Sets the camera location.
-         *
-         * @param location the camera location
-         * @return the builder instance
-         * @throws IllegalArgumentException if the location is null
          */
         public Builder setLocation(Point location)
         {
             if (location == null)
                 throw new IllegalArgumentException("ERROR: Camera location cannot be null.");
             camera.location = location;
+            baseLocation = location;
             return this;
         }
 
-
-        /// -------------------3 setDirection functions--------------------
-
         /**
          * Sets the camera direction using two orthogonal vectors: forward (vTo) and upward (vUp).
-         *
-         * @param vTo the forward direction vector
-         * @param vUp the upward direction vector
-         * @return this Builder object
-         * @throws IllegalArgumentException if vectors are null, zero, or not orthogonal
          */
         public Builder setDirection(Vector vTo, Vector vUp) {
             if (vTo == null || vUp == null)
@@ -238,18 +186,13 @@ public class Camera implements Cloneable {
 
             camera.vTo = vTo.normalize();
             camera.vUp = vUp.normalize();
+            baseVTo = camera.vTo;
+            baseVUp = camera.vUp;
             return this;
         }
 
-
         /**
          * Sets the camera direction using a target point and an approximate up vector.
-         * Calculates the correct vTo, vRight, and vUp vectors automatically.
-         *
-         * @param target the point the camera is directed toward
-         * @param approxUp an approximate up direction vector (not necessarily orthogonal)
-         * @return this Builder object
-         * @throws IllegalArgumentException if any argument is null or if p0 has not been set
          */
         public Builder setDirection(Point target, Vector approxUp) {
             if (camera.location == null)
@@ -263,32 +206,21 @@ public class Camera implements Cloneable {
 
             camera.vTo = vTo.normalize();
             camera.vUp = vUp.normalize();
+            baseVTo = camera.vTo;
+            baseVUp = camera.vUp;
             return this;
         }
 
-
         /**
-         * Sets the camera direction using a target point.
-         * Assumes the default "up" direction is the positive Y axis (0,1,0).
-         *
-         * @param target the point the camera is directed toward
-         * @return this Builder object
-         * @throws IllegalArgumentException if the target is null or if p0 has not been set
+         * Sets the camera direction using a target point with default up vector.
          */
         public Builder setDirection(Point target) {
             return setDirection(target, new Vector(0, 1, 0));
         }
 
-        /// ------------------------------------------------------------------------------------------
-
-
         /**
          * Sets the view plane size.
-         * @param width  the width of the view plane
-         * @param height the height of the view plane
-         * @return this Builder object
-         * @throws IllegalArgumentException if width or height is not positive
-       */
+         */
         public Builder setVpSize(double width, double height) {
             if (width <= 0 || height <= 0)
                 throw new IllegalArgumentException("ERROR: VP size must be positive.");
@@ -297,13 +229,8 @@ public class Camera implements Cloneable {
             return this;
         }
 
-
         /**
          * Sets the distance from the camera to the view plane.
-         *
-         * @param distance the distance from the camera to the view plane
-         * @return this Builder object
-         * @throws IllegalArgumentException if distance is not positive
          */
         public Builder setVpDistance(double distance) {
             if (distance <= 0)
@@ -312,14 +239,8 @@ public class Camera implements Cloneable {
             return this;
         }
 
-
         /**
          * Sets the resolution of the view plane.
-         *
-         * @param nx the number of pixels in the x direction
-         * @param ny the number of pixels in the y direction
-         * @return this Builder object
-         * @throws IllegalArgumentException if nx or ny is not positive
          */
         public Builder setResolution(int nx,int ny){
             if (nx <= 0 || ny <= 0)
@@ -329,13 +250,8 @@ public class Camera implements Cloneable {
             return this;
         }
 
-
-
         /**
          * Set the ray tracer
-         * @param scene,
-         * @param rayTracerType
-         * @return the camera builder
          */
         public Builder setRayTracer(Scene scene, RayTracerType rayTracerType) {
             if (scene == null || rayTracerType == null)
@@ -347,13 +263,104 @@ public class Camera implements Cloneable {
             return this;
         }
 
+        // ================= TRANSFORMATION METHODS =================
+
+        /**
+         * Rotates the camera around the Z-axis by the given angle in degrees.
+         *
+         * @param angleDegrees the rotation angle in degrees
+         * @return this Builder object
+         */
+        public Builder rotateZ(double angleDegrees) {
+            return rotate(angleDegrees, new Vector(0, 0, 1));
+        }
+
+        /**
+         * Rotates the camera around an arbitrary axis by the given angle in degrees.
+         *
+         * @param angleDegrees the rotation angle in degrees
+         * @param axis the rotation axis (will be normalized)
+         * @return this Builder object
+         */
+        public Builder rotate(double angleDegrees, Vector axis) {
+            if (axis == null)
+                throw new IllegalArgumentException("ERROR: Rotation axis cannot be null.");
+            if (axis.lengthSquared() == 0)
+                throw new IllegalArgumentException("ERROR: Rotation axis cannot be zero vector.");
+            if (camera.vTo == null || camera.vUp == null)
+                throw new IllegalArgumentException("ERROR: Camera direction must be set before rotation.");
+
+            double angleRadians = Math.toRadians(angleDegrees);
+            axis = axis.normalize();
+
+            // Apply Rodrigues' rotation formula
+            camera.vTo = rotateVector(camera.vTo, axis, angleRadians);
+            camera.vUp = rotateVector(camera.vUp, axis, angleRadians);
+
+            hasTransformations = true;
+            return this;
+        }
 
 
         /**
-         * Builds and returns a new Camera object with the specified properties.
+         * Helper method to rotate a vector using Rodrigues' rotation formula.
+         */
+        private Vector rotateVector(Vector v, Vector axis, double angleRadians) {
+            double cosTheta = Math.cos(angleRadians);
+            double sinTheta = Math.sin(angleRadians);
+
+            // Rodrigues' rotation formula: v' = v*cos(θ) + (k×v)*sin(θ) + k*(k·v)*(1-cos(θ))
+            Vector crossProduct = axis.crossProduct(v);
+            double dotProduct = axis.dotProduct(v);
+
+            return v.scale(cosTheta)
+                    .add(crossProduct.scale(sinTheta))
+                    .add(axis.scale(dotProduct * (1 - cosTheta)));
+        }
+        /**
+         * Fait orbiter la caméra autour d'un point central à une distance donnée
          *
-         * @return a new Camera object
-         * @throws IllegalStateException if the camera is not properly configured
+         * @param centre le point autour duquel orbiter
+         * @param angleDegres l'angle de rotation en degrés
+         * @param axe l'axe de rotation (généralement AXIS_Y pour rotation horizontale)
+         * @return this Builder object
+         */
+        public Builder orbitAround(Point centre, double angleDegres, Vector axe) {
+            if (centre == null)
+                throw new IllegalArgumentException("ERREUR: Le centre d'orbite ne peut pas être null.");
+            if (axe == null)
+                throw new IllegalArgumentException("ERREUR: L'axe de rotation ne peut pas être null.");
+            if (axe.lengthSquared() == 0)
+                throw new IllegalArgumentException("ERREUR: L'axe de rotation ne peut pas être un vecteur zéro.");
+            if (camera.location == null)
+                throw new IllegalArgumentException("ERREUR: La position de la caméra doit être définie avant l'orbite.");
+
+            double angleRadians = Math.toRadians(angleDegres);
+            axe = axe.normalize();
+
+            // Calculer le vecteur de la position actuelle vers le centre
+            Vector vecToCentre = centre.subtract(camera.location);
+
+            // Faire tourner ce vecteur autour de l'axe
+            Vector vecToCentreRotated = rotateVector(vecToCentre, axe, angleRadians);
+
+            // Calculer la nouvelle position
+            camera.location = centre.subtract(vecToCentreRotated);
+
+            // Optionnel : faire regarder la caméra vers le centre
+            Vector direction = centre.subtract(camera.location);
+            if (direction.lengthSquared() > 0) {
+                camera.vTo = direction.normalize();
+                // Recalculer vRight et vUp
+                camera.vRight = camera.vTo.crossProduct(Vector.AXIS_Y).normalize();
+                camera.vUp = camera.vRight.crossProduct(camera.vTo).normalize();
+            }
+
+            hasTransformations = true;
+            return this;
+        }
+        /**
+         * Builds and returns a new Camera object with the specified properties.
          */
         public Camera build()  {
             String MISSING_DATA = "ERROR: Camera setup incomplete: missing rendering data.";
@@ -366,9 +373,9 @@ public class Camera implements Cloneable {
             if (camera.vUp == null)
                 throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "vUp");
             if (!isZero(camera.vTo.lengthSquared() - 1 ))
-                throw new IllegalArgumentException("ERROR: THe vector vTo isn't normalized");
+                throw new IllegalArgumentException("ERROR: The vector vTo isn't normalized");
             if (!isZero(camera.vUp.lengthSquared() - 1 ))
-                throw new IllegalArgumentException("ERROR: THe vector vUp isn't normalized");
+                throw new IllegalArgumentException("ERROR: The vector vUp isn't normalized");
             if (camera.width == 0)
                 throw new MissingResourceException(MISSING_DATA, CLASS_NAME, "width");
             if (camera.height == 0)
@@ -378,7 +385,7 @@ public class Camera implements Cloneable {
             if  (camera.nX <= 0 || camera.nY <= 0)
                 throw new IllegalArgumentException("ERROR: The resolution cannot be negative");
 
-            // Compute vRight if not yet calculated
+            // Compute vRight
             Vector vRight = camera.vTo.crossProduct(camera.vUp);
             if (vRight.lengthSquared() == 0)
                 throw new IllegalArgumentException("ERROR: vTo and vUp cannot be parallel – cannot compute vRight.");
@@ -396,4 +403,3 @@ public class Camera implements Cloneable {
         }
     }
 }
-
