@@ -1,8 +1,11 @@
 package renderer;
 
 import primitives.*;
+import renderer.sampling.*;
 import scene.Scene;
 
+import java.awt.geom.Point2D;
+import java.util.List;
 import java.util.MissingResourceException;
 
 import static primitives.Util.isZero;
@@ -26,6 +29,11 @@ public class Camera implements Cloneable {
     private RayTracerBase rayTracer;
     private int nX = 1;
     private int nY = 1;
+
+    // === super‐sampling fields ===
+    private SamplingConfig samplingConfig = new SamplingConfig();
+    private SuperSamplingBlackboard blackboard = new SuperSamplingBlackboard(samplingConfig);
+
 
     /**
      * Renders the image by casting rays through each pixel of the view plane.
@@ -83,10 +91,28 @@ public class Camera implements Cloneable {
      */
     private void castRay(int column, int row)
     {
-        Ray ray = constructRay(nX, nY, column, row);
-        Color color = rayTracer.traceRay(ray);
-        imageWriter.writePixel(column, row, color);
+        double pixelW = width / nX;
+        double pixelH = height / nY;
+
+        List<Point2D.Double> samples = blackboard.getSampleOffsets(pixelW, pixelH);
+        Color pixelColor = new Color(0, 0, 0);
+
+        for (Point2D.Double off : samples) {
+            double xJ = (column - (nX - 1) / 2.0) * pixelW + off.x;
+            double yI = (row - (nY - 1) / 2.0) * pixelH + off.y;
+
+            Point pC = location.add(vTo.scale(distance));
+            if (!isZero(xJ)) pC = pC.add(vRight.scale(xJ));
+            if (!isZero(yI)) pC = pC.add(vUp.scale(-yI));
+
+            Ray sampleRay = new Ray(location, pC.subtract(location));
+            pixelColor = pixelColor.add(rayTracer.traceRay(sampleRay));
+        }
+
+        pixelColor = pixelColor.scale(1.0 / samples.size());
+        imageWriter.writePixel(column, row, pixelColor);
     }
+
 
     /**
      * Constructs a ray through a specific pixel on the view plane.
@@ -262,7 +288,14 @@ public class Camera implements Cloneable {
                 camera.rayTracer = null;
             return this;
         }
-
+        /**
+         * Configure anti‐aliasing parameters.
+         */
+        public Builder setSamplingConfig(SamplingConfig config) {
+            camera.samplingConfig = config;
+            camera.blackboard = new SuperSamplingBlackboard(config);
+            return this;
+        }
         // ================= TRANSFORMATION METHODS =================
 
         /**
