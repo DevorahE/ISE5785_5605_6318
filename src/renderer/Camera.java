@@ -5,8 +5,10 @@ import renderer.sampling.*;
 import scene.Scene;
 
 import java.awt.geom.Point2D;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.stream.IntStream;
 
 import static primitives.Util.isZero;
 
@@ -30,28 +32,51 @@ public class Camera implements Cloneable {
     private int nX = 1;
     private int nY = 1;
 
-    // === super‐sampling fields ===
-    private SamplingConfig samplingConfig = new SamplingConfig();
-    private SuperSamplingBlackboard blackboard = new SuperSamplingBlackboard(samplingConfig);
-
+    /** Amount of threads to use fore rendering image by the camera */
+    private int threadsCount = 0;
+    /**
+     * Amount of threads to spare for Java VM threads:<br>
+     * Spare threads if trying to use all the cores
+     */
+    private static final int SPARE_THREADS = 2;
+    /**
+     * Debug print interval in seconds (for progress percentage)<br>
+     * if it is zero - there is no progress output
+     */
+    private double printInterval = 0;
+    /**
+     * Pixel manager for supporting:
+     * <ul>
+     * <li>multi-threading</li>
+     * <li>debug print of progress percentage in Console window/tab</li>
+     * </ul>
+     */
+    private PixelManager pixelManager;
 
     /**
-     * Renders the image by casting rays through each pixel of the view plane.
-     *
-     * @return the Camera instance for method chaining
+     * Number of super sampling rays for antialiasing algorithm.
      */
-    public Camera renderImage()
-    {
-        int nx = imageWriter.nX();
-        int ny = imageWriter.nY();
+    private int numOfRaysAA = 1;
 
-        for (int i=0; i < nx; i++)
-        {
-            for(int j=0; j < ny; j++)
-                castRay(j, i);
-        }
-        return this;
-    }
+    /**
+     * Number of super sampling rays for depth of field algorithm.
+     */
+    private int numOfRaysDOF = 1;
+
+    /**
+     * Camera's aperture window which depends on camera's aperture.
+     */
+    private TargetArea apertureWindow;
+
+    /**
+     * Focal plane distance from camera
+     */
+    private double distanceFocalPlane;
+
+    /**
+     * Defines the sampling pattern used for generating points on a target area in the camera view plane.
+     */
+    private TargetArea.SamplingPattern samplingPattern = TargetArea.SamplingPattern.JITTERED;
 
     /**
      * Prints a grid on the view plane for debugging purposes.
@@ -83,35 +108,7 @@ public class Camera implements Cloneable {
         return this ;
     }
 
-    /**
-     * Casts a ray through a specific pixel on the view plane and writes the color to the image.
-     *
-     * @param column the pixel index in the X direction.
-     * @param row    the pixel index in the Y direction.
-     */
-    private void castRay(int column, int row)
-    {
-        double pixelW = width / nX;
-        double pixelH = height / nY;
 
-        List<Point2D.Double> samples = blackboard.getSampleOffsets(pixelW, pixelH);
-        Color pixelColor = new Color(0, 0, 0);
-
-        for (Point2D.Double off : samples) {
-            double xJ = (column - (nX - 1) / 2.0) * pixelW + off.x;
-            double yI = (row - (nY - 1) / 2.0) * pixelH + off.y;
-
-            Point pC = location.add(vTo.scale(distance));
-            if (!isZero(xJ)) pC = pC.add(vRight.scale(xJ));
-            if (!isZero(yI)) pC = pC.add(vUp.scale(-yI));
-
-            Ray sampleRay = new Ray(location, pC.subtract(location));
-            pixelColor = pixelColor.add(rayTracer.traceRay(sampleRay));
-        }
-
-        pixelColor = pixelColor.scale(1.0 / samples.size());
-        imageWriter.writePixel(column, row, pixelColor);
-    }
 
 
     /**
@@ -152,6 +149,52 @@ public class Camera implements Cloneable {
         // Return the constructed ray
         return new Ray(location, vIJ);
     }
+    /**
+     * Constructs a beam of rays through a specific pixel on the view plane.
+     *
+     * @param nX the number of pixels along the X-axis (image width)
+     * @param nY the number of pixels along the Y-axis (image height)
+     * @param j the column index of the pixel (X-axis)
+     * @param i the row index of the pixel (Y-axis)
+     * @return a list of rays representing the beam through the specified pixel
+     */
+    public List<Ray> constructBeam(int nX, int nY, int j, int i) {
+        Point pC = location.add(vTo.scale(distance));
+        double rY = height / nY;
+        double rX = width / nX;
+        double yI = -(i - 0.5 * (nY - 1)) * rY;
+        double xJ = (j - 0.5 * (nX - 1)) * rX;
+        Point pIJ = pC;
+        if (!Util.isZero(xJ))
+            pIJ = pIJ.add(vRight.scale(xJ));
+        if (!Util.isZero(yI))
+            pIJ = pIJ.add(vUp.scale(yI));
+        Ray mainRay = new Ray(location, pIJ.subtract(location));
+        if (numOfRaysAA == 1)
+            return List.of(mainRay);
+        QuadrilateralTargetArea targetArea = new QuadrilateralTargetArea(rY, rX, vRight, vTo, pIJ, numOfRaysAA, samplingPattern);
+        return mainRay.createBeam(targetArea);
+    }
+
+    private void castRay(int j, int i) {
+        List<Ray> beamRays = constructBeam(nX, nY, j, i);
+        Color pixelColor = Color.BLACK;
+        for (Ray ray : beamRays) {
+            if(apertureWindow != null && numOfRaysDOF > 1) {
+                List<Ray> beamRaysDOF = ray.createBeamReverse(apertureWindow, distanceFocalPlane);
+                Color rayColor = Color.BLACK;
+                for (Ray rayDOF : beamRaysDOF)
+                    rayColor = rayColor.add(rayTracer.traceRay(rayDOF));
+                rayColor = rayColor.reduce(beamRaysDOF.size());
+                pixelColor = pixelColor.add(rayColor);
+            }
+
+            else
+                pixelColor = pixelColor.add(rayTracer.traceRay(ray));
+        }
+        imageWriter.writePixel(j, i, pixelColor.reduce(beamRays.size()));
+        pixelManager.pixelDone();
+    }
 
     // Getters
     public Point getLocation() { return location; }
@@ -173,6 +216,59 @@ public class Camera implements Cloneable {
      */
     public static Builder getBuilder() {
         return new Builder();
+    }
+
+
+    /**
+     * Render image using multi-threading by parallel streaming
+     * @return the camera object itself
+     */
+    private Camera renderImageStream() {
+        IntStream.range(0, nY).parallel()
+                .forEach(i -> IntStream.range(0, nX).parallel()
+                        .forEach(j -> castRay(j, i)));
+        return this;
+    }
+    /**
+     * Render image without multi-threading
+     * @return the camera object itself
+     */
+    private Camera renderImageNoThreads() {
+        for (int i = 0; i < nY; ++i)
+            for (int j = 0; j < nX; ++j)
+                castRay(j, i);
+        return this;
+    }
+    /**
+     * Render image using multi-threading by creating and running raw threads
+     * @return the camera object itself
+     */
+    private Camera renderImageRawThreads() {
+        var threads = new LinkedList<Thread>();
+        while (threadsCount-- > 0)
+            threads.add(new Thread(() -> {
+                PixelManager.Pixel pixel;
+                while ((pixel = pixelManager.nextPixel()) != null)
+                    castRay(pixel.col(), pixel.row());
+            }));
+        for (var thread : threads) thread.start();
+        try {
+            for (var thread : threads) thread.join();
+        } catch (InterruptedException ignored) {}
+        return this;
+    }
+
+    /** This function renders image's pixel color map from the scene
+     * included in the ray tracer object
+     * @return the camera object itself
+     */
+    public Camera renderImage() {
+        pixelManager = new PixelManager(nY, nX, printInterval);
+        return switch (threadsCount) {
+            case 0 -> renderImageNoThreads();
+            case -1 -> renderImageStream();
+            default -> renderImageRawThreads();
+        };
     }
 
     /**
@@ -288,14 +384,80 @@ public class Camera implements Cloneable {
                 camera.rayTracer = null;
             return this;
         }
+
+
         /**
-         * Configure anti‐aliasing parameters.
+         * Sets the distance from the camera to the focal plane.
+         *
+         * @param distanceFocalPlane the distance value
+         * @return this builder
+         * @throws IllegalArgumentException if distance is not positive
          */
-        public Builder setSamplingConfig(SamplingConfig config) {
-            camera.samplingConfig = config;
-            camera.blackboard = new SuperSamplingBlackboard(config);
+        public Builder setDistanceFocalPlane(double distanceFocalPlane) {
+            if (Util.alignZero(distanceFocalPlane) < 0)
+                throw new IllegalArgumentException("Distance must be positive");
+            camera.distanceFocalPlane = distanceFocalPlane;
             return this;
         }
+
+        /**
+         * Sets the number of super sampling rays for antialiasing algorithm
+         *
+         * @param numOfRaysAA number of super sampling rays for antialiasing algorithm
+         * @return this builder
+         * @throws IllegalArgumentException if numOfRays is smaller than 1
+         */
+        public Builder setNumOfRaysAA(int numOfRaysAA) {
+            if (numOfRaysAA < 1)
+                throw new IllegalArgumentException("Number of super sampling rays must not be smaller than 1");
+            camera.numOfRaysAA = numOfRaysAA;
+            return this;
+        }
+
+        /**
+         * Sets the number of super sampling rays for depth of field algorithm
+         *
+         * @param numOfRaysDOF number of super sampling rays for depth of field algorithm
+         * @return this builder
+         * @throws IllegalArgumentException if numOfRays is smaller than 1
+         */
+        public Builder setNumOfRaysDOF(int numOfRaysDOF) {
+            if (numOfRaysDOF < 1)
+                throw new IllegalArgumentException("Number of super sampling rays must not be smaller than 1");
+            camera.numOfRaysDOF = numOfRaysDOF;
+            return this;
+        }
+
+        /**
+         * Sets the number of super sampling rays for depth of field algorithm
+         *
+         * @param height the height of the aperture window
+         * @param width the width of the aperture window
+         * @return this builder
+         * @throws IllegalArgumentException if parameters are negative
+         * @throws IllegalArgumentException if necessary components for aperture window are not initialized yet
+         */
+        public Builder setApertureWindow(double height, double width) {
+            if (camera.vRight == null || camera.vTo == null || camera.location == null)
+                throw new IllegalArgumentException("Must initialize other components of the camera before setting aperture window");
+            if (height <= 0 || width <= 0)
+                throw new IllegalArgumentException("Height and width must not be negative");
+            camera.apertureWindow = new QuadrilateralTargetArea(height, width, camera.vRight, camera.vTo, camera.location, camera.numOfRaysDOF, camera.samplingPattern);
+            return this;
+        }
+
+
+        /**
+         * Sets the sampling pattern for the target area.
+         *
+         * @param pattern the sampling pattern to use, such as RANDOM, GRID, or JITTERED
+         * @return this builder instance
+         */
+        public Builder setSamplingPattern(TargetArea.SamplingPattern pattern) {
+            camera.samplingPattern = pattern;
+            return this;
+        }
+
         // ================= TRANSFORMATION METHODS =================
 
         /**
@@ -392,6 +554,42 @@ public class Camera implements Cloneable {
             hasTransformations = true;
             return this;
         }
+
+
+        /**
+         * Set multi-threading <br>
+         * Parameter value meaning:
+         * <ul>
+             * <li>-2 - number of threads is number of logical processors less 2</li>
+             * <li>-1 - stream processing parallelization (implicit multi-threading) is used</li>
+             * <li>0 - multi-threading is not activated</li>
+             * <li>1 and more - literally number of threads</li>
+         * </ul>
+         * @param threads number of threads
+         * @return builder object itself
+        */
+        public Builder setMultithreading(int threads) {
+            if (threads < -3)
+                throw new IllegalArgumentException("Multithreading parameter must be -2 or higher");
+            if (threads == -2) {
+                int cores = Runtime.getRuntime().availableProcessors() - SPARE_THREADS;
+                camera.threadsCount = cores <= 2 ? 1 : cores;
+            } else
+                camera.threadsCount = threads;
+            return this;
+        }
+        /**
+         * Set debug printing interval. If it's zero - there won't be printing at all
+         * @param interval printing interval in %
+         * @return builder object itself
+         */
+        public Builder setDebugPrint(double interval) {
+            if (interval < 0) throw new IllegalArgumentException("interval parameter must be non-negative");
+            camera.printInterval = interval;
+            return this;
+        }
+
+
         /**
          * Builds and returns a new Camera object with the specified properties.
          */

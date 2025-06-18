@@ -9,12 +9,11 @@ import primitives.Color;
 import primitives.Material;
 import primitives.Point;
 import primitives.Vector;
-import renderer.sampling.*;
 import scene.Scene;
 
 import static java.awt.Color.BLUE;
 
-public class AntiAliasingTransparentSphereTest {
+public class AntiAliasingTest {
     /** Scene of the tests */
     private final Scene scene      = new Scene("Test scene");
     /** Camera builder of the tests */
@@ -58,11 +57,11 @@ public class AntiAliasingTransparentSphereTest {
         // Enable 81 sample grid super-sampling (from first version)
         camera
                 .setResolution(400, 400)
-                .setSamplingConfig(new SamplingConfig(
-                        81, TargetShape.RECTANGLE, SamplingPattern.GRID))
+                .setNumOfRaysAA(81) // 9x9 grid of samples per pixel
                 .build() //
                 .renderImage() //
                 .writeToImage(pictName+ "WithAntiAliasing");
+
 
     }
 }

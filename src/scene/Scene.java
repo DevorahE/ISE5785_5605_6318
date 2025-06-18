@@ -4,6 +4,7 @@ import geometries.Geometries;
 import lighting.AmbientLight;
 import lighting.LightSource;
 import primitives.Color;
+import primitives.TargetArea;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +38,10 @@ public class Scene {
      * List of light sources in the scene
      */
     public List<LightSource> lights = new LinkedList<>();
+    /**
+     * Defines the sampling pattern used for generating points on a target area in the scene.
+     */
+    public TargetArea.SamplingPattern samplingPattern = TargetArea.SamplingPattern.JITTERED;
 
     /**
      * Scene setter
@@ -82,6 +87,17 @@ public class Scene {
      */
     public Scene setGeometries(Geometries geometries) {
         this.geometries = geometries;
+        return this;
+    }
+    /**
+     * Sets the sampling pattern to be used for generating points on a target area in the rendered scene.
+     *
+     * @param samplingPattern the sampling pattern to use for distributing points
+     *                        (e.g., RANDOM, GRID, JITTERED)
+     * @return this Scene object for method chaining
+     */
+    public Scene setSamplingPattern(TargetArea.SamplingPattern samplingPattern) {
+        this.samplingPattern = samplingPattern;
         return this;
     }
 
