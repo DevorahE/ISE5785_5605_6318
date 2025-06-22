@@ -78,6 +78,191 @@ public class Camera implements Cloneable {
      */
     private TargetArea.SamplingPattern samplingPattern = TargetArea.SamplingPattern.JITTERED;
 
+
+    /**
+     * Adaptive super sampling configuration.
+     * This is used to enable or disable adaptive super sampling and set its parameters.
+     */
+    private AdaptiveSuperSamplingConfig assConfig = AdaptiveSuperSamplingConfig.DISABLED;
+
+    /**
+     * Sets the adaptive super sampling configuration for the camera.
+     * This method allows you to specify the depth and threshold for adaptive super sampling.
+     *
+     * @param depth the maximum depth of adaptive super sampling
+     * @param threshold the color difference threshold for adaptive super sampling
+     * @return this Camera instance with the updated adaptive super sampling configuration
+     */
+    public Camera setAdaptiveSuperSampling(int depth, double threshold) {
+        this.assConfig = new AdaptiveSuperSamplingConfig(depth, threshold);
+        return this;
+    }
+
+
+    /**
+     * Casts a ray through the pixel at (j, i) with adaptive super sampling.
+     * This method recursively samples sub-pixels and averages their colors if they are similar.
+     *
+     * @param j the column index of the pixel
+     * @param i the row index of the pixel
+     * @param subX the x-coordinate of the sub-pixel
+     * @param subY the y-coordinate of the sub-pixel
+     * @param subW the width of the sub-pixel
+     * @param subH the height of the sub-pixel
+     * @param depth the current depth in the recursive sampling process
+     * @return the averaged color of the sampled sub-pixels
+     */
+    private Color castRayAdaptive(int j, int i,
+                                  double subX, double subY,
+                                  double subW, double subH,
+                                  int depth) {
+
+        /* --- Stop condition --- */
+        if (depth >= assConfig.maxDepth) {
+            return sampleSubPixel(j, i,
+                    subX + subW * 0.5,
+                    subY + subH * 0.5);
+        }
+
+        Color cTL = sampleSubPixel(j, i, subX,           subY          );
+        Color cTR = sampleSubPixel(j, i, subX + subW,    subY          );
+        Color cBL = sampleSubPixel(j, i, subX,           subY + subH   );
+        Color cBR = sampleSubPixel(j, i, subX + subW,    subY + subH   );
+
+        if (colorsAreSimilar(cTL, cTR, cBL, cBR))
+            return cTL.add(cTR).add(cBL).add(cBR).scale(0.25);
+
+        double halfW = subW * 0.5, halfH = subH * 0.5;
+
+        Color s1 = castRayAdaptive(j, i, subX,           subY,           halfW, halfH, depth + 1);
+        Color s2 = castRayAdaptive(j, i, subX + halfW,   subY,           halfW, halfH, depth + 1);
+        Color s3 = castRayAdaptive(j, i, subX,           subY + halfH,   halfW, halfH, depth + 1);
+        Color s4 = castRayAdaptive(j, i, subX + halfW,   subY + halfH,   halfW, halfH, depth + 1);
+
+        return s1.add(s2).add(s3).add(s4).scale(0.25);
+    }
+
+    /**
+     * Samples a sub-pixel at the specified coordinates (j, i) with sub-pixel offsets.
+     * This method calculates the exact position in 3D space and traces a ray to get the color.
+     *
+     * @param j the column index of the pixel
+     * @param i the row index of the pixel
+     * @param subPixelX the x-coordinate offset within the pixel
+     * @param subPixelY the y-coordinate offset within the pixel
+     * @return the color sampled at the specified sub-pixel location
+     */
+    private Color sampleSubPixel(int j, int i, double subPixelX, double subPixelY) {
+        double Ry = height / nY;
+        double Rx = width / nX;
+
+        double Yi = -(i - (nY - 1) / 2d) * Ry;
+        double Xj = (j - (nX - 1) / 2d) * Rx;
+
+        double offsetX = (subPixelX - 0.5) * Rx;
+        double offsetY = (subPixelY - 0.5) * Ry;
+
+        Point pIJ = location.add(vTo.scale(distance));
+        if (!isZero(Xj + offsetX)) pIJ = pIJ.add(vRight.scale(Xj + offsetX));
+        if (!isZero(Yi + offsetY)) pIJ = pIJ.add(vUp.scale(Yi + offsetY));
+
+        Ray ray = new Ray(location, pIJ.subtract(location).normalize());
+        return traceWithDOF(ray);
+
+    }
+
+
+    /**
+     * Checks if the four colors are similar based on the average color and the configured threshold.
+     *
+     * @param c1 the first color
+     * @param c2 the second color
+     * @param c3 the third color
+     * @param c4 the fourth color
+     * @return true if all colors are similar, false otherwise
+     */
+    private boolean colorsAreSimilar(Color c1, Color c2, Color c3, Color c4) {
+        Color avg = c1.add(c2).add(c3).add(c4).scale(0.25);
+        return colorDistance(c1, avg) < assConfig.colorThreshold &&
+                colorDistance(c2, avg) < assConfig.colorThreshold &&
+                colorDistance(c3, avg) < assConfig.colorThreshold &&
+                colorDistance(c4, avg) < assConfig.colorThreshold;
+    }
+
+    /**
+     * Calculates the Euclidean distance between two colors.
+     * The distance is normalized to a range of 0 to 1.
+     *
+     * @param c1 the first color
+     * @param c2 the second color
+     * @return the normalized distance between the two colors
+     */
+    private double colorDistance(Color c1, Color c2) {
+        double dr = c1.getColor().getRed() - c2.getColor().getRed();
+        double dg = c1.getColor().getGreen() - c2.getColor().getGreen();
+        double db = c1.getColor().getBlue() - c2.getColor().getBlue();
+        return Math.sqrt(dr * dr + dg * dg + db * db) / 255.0;
+    }
+
+
+    /**
+     * Traces a ray through the scene and applies depth of field if configured.
+     * If the aperture window is set and the number of rays for DOF is greater than 1,
+     * it creates a beam of rays through the aperture window.
+     *
+     * @param ray the ray to trace
+     * @return the color resulting from tracing the ray
+     */
+    private Color traceWithDOF(Ray ray) {
+        if (apertureWindow != null && numOfRaysDOF > 1) {
+            List<Ray> dofRays = ray.createBeamReverse(apertureWindow, distanceFocalPlane);
+            Color c = Color.BLACK;
+            for (Ray r : dofRays)  c = c.add(rayTracer.traceRay(r));
+            return c.reduce(dofRays.size());
+        }
+        return rayTracer.traceRay(ray);
+    }
+
+
+    /**
+     * Casts a ray through the pixel at (j, i) and writes the pixel color to the image.
+     * This method handles depth of field and antialiasing if configured.
+     *
+     * @param j the column index of the pixel
+     * @param i the row index of the pixel
+     */
+    private void castRay(int j, int i) {
+
+        Color pixelColor;
+
+        /* ---------- 1.  Adaptive Super Sampling ---------- */
+        if (assConfig.enabled) {
+            pixelColor = castRayAdaptive(
+                    j, i,
+                    0, 0,
+                    1, 1,
+                    0
+            );
+        }
+
+        else if (numOfRaysAA > 1) {
+            List<Ray> aaBeam = constructBeam(nX, nY, j, i);
+            pixelColor = Color.BLACK;
+            for (Ray ray : aaBeam)
+                pixelColor = pixelColor.add(traceWithDOF(ray));
+            pixelColor = pixelColor.reduce(aaBeam.size());
+        }
+
+        else {
+            Ray ray = constructRay(nX, nY, j, i);
+            pixelColor = traceWithDOF(ray);
+        }
+
+        imageWriter.writePixel(j, i, pixelColor);
+        pixelManager.pixelDone();
+    }
+
+
     /**
      * Prints a grid on the view plane for debugging purposes.
      * @param interval
@@ -107,8 +292,6 @@ public class Camera implements Cloneable {
         imageWriter.writeToImage(nameFile);
         return this ;
     }
-
-
 
 
     /**
@@ -149,6 +332,7 @@ public class Camera implements Cloneable {
         // Return the constructed ray
         return new Ray(location, vIJ);
     }
+
     /**
      * Constructs a beam of rays through a specific pixel on the view plane.
      *
@@ -176,25 +360,7 @@ public class Camera implements Cloneable {
         return mainRay.createBeam(targetArea);
     }
 
-    private void castRay(int j, int i) {
-        List<Ray> beamRays = constructBeam(nX, nY, j, i);
-        Color pixelColor = Color.BLACK;
-        for (Ray ray : beamRays) {
-            if(apertureWindow != null && numOfRaysDOF > 1) {
-                List<Ray> beamRaysDOF = ray.createBeamReverse(apertureWindow, distanceFocalPlane);
-                Color rayColor = Color.BLACK;
-                for (Ray rayDOF : beamRaysDOF)
-                    rayColor = rayColor.add(rayTracer.traceRay(rayDOF));
-                rayColor = rayColor.reduce(beamRaysDOF.size());
-                pixelColor = pixelColor.add(rayColor);
-            }
 
-            else
-                pixelColor = pixelColor.add(rayTracer.traceRay(ray));
-        }
-        imageWriter.writePixel(j, i, pixelColor.reduce(beamRays.size()));
-        pixelManager.pixelDone();
-    }
 
     // Getters
     public Point getLocation() { return location; }
@@ -589,6 +755,12 @@ public class Camera implements Cloneable {
             return this;
         }
 
+
+
+        public Builder setAdaptiveSuperSampling(int depth) {
+            camera.setAdaptiveSuperSampling(depth, camera.assConfig.colorThreshold);
+            return this;
+        }
 
         /**
          * Builds and returns a new Camera object with the specified properties.
