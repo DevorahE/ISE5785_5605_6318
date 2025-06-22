@@ -3,12 +3,11 @@ package renderer;
 import geometries.*;
 import lighting.AmbientLight;
 import lighting.DirectionalLight;
-import lighting.PointLight;
 import lighting.SpotLight;
 import primitives.*;
 import org.junit.jupiter.api.Test;
-import renderer.sampling.*;
 import scene.Scene;
+import targetAreas.TargetArea;
 
 import java.util.ArrayList;
 import java.util.List;

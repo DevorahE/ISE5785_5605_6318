@@ -1,4 +1,6 @@
-package primitives;
+package targetAreas;
+
+import primitives.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +11,7 @@ import java.util.List;
  * characterized by its radius, orientation, and center position. It provides
  * methods for generating sampling points on its surface using different patterns.
  */
-public class CircleTargetArea extends TargetArea{
+public class CircleTargetArea extends TargetArea {
     /**
      * The radius of the target area.
      */

@@ -1,4 +1,8 @@
-package primitives;
+package targetAreas;
+import primitives.Point;
+import primitives.Ray;
+import primitives.Vector;
+
 import java.util.List;
 import java.util.Random;
 

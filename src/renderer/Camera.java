@@ -1,10 +1,10 @@
 package renderer;
 
 import primitives.*;
-import renderer.sampling.*;
 import scene.Scene;
+import targetAreas.QuadrilateralTargetArea;
+import targetAreas.TargetArea;
 
-import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.MissingResourceException;

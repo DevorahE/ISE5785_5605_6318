@@ -1,4 +1,6 @@
-package primitives;
+package targetAreas;
+
+import primitives.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.List;
  * This target area is defined by its height and width and is capable of generating
  * sampling points using different patterns such as RANDOM, GRID, or JITTERED.
  */
-public class QuadrilateralTargetArea extends TargetArea{
+public class QuadrilateralTargetArea extends TargetArea {
 
     /**
      * Represents the height of the quadrilateral target area.

@@ -1,11 +1,10 @@
 package primitives;
 import geometries.Intersectable.Intersection;
-import renderer.sampling.Blackboard;
-import renderer.sampling.SuperSamplingBlackboard;
+
+import targetAreas.TargetArea;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Class Ray is the basic class representing a ray of geometry
