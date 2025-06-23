@@ -669,7 +669,20 @@ public class Camera implements Cloneable {
         private Vector rotateVector(Vector v, Vector axis, double angleRadians) {
             double cosTheta = Math.cos(angleRadians);
             double sinTheta = Math.sin(angleRadians);
+            if (Math.abs(angleRadians) < 1e-8)
+                return v;
 
+            // Cas 2 : v est colinéaire à axis → rotation inutile ou inversion
+            Vector cross;
+            try {
+                cross = axis.crossProduct(v);
+            } catch (IllegalArgumentException e) {
+                // Colinéaire → rotation de 180° = inversion si angle ≈ π
+                if (Math.abs(Math.abs(angleRadians) - Math.PI) < 1e-6)
+                    return v.scale(-1); // Inversion
+                else
+                    return v;
+            }
             // Rodrigues' rotation formula: v' = v*cos(θ) + (k×v)*sin(θ) + k*(k·v)*(1-cos(θ))
             Vector crossProduct = axis.crossProduct(v);
             double dotProduct = axis.dotProduct(v);
@@ -678,12 +691,15 @@ public class Camera implements Cloneable {
                     .add(crossProduct.scale(sinTheta))
                     .add(axis.scale(dotProduct * (1 - cosTheta)));
         }
+
+
         /**
-         * Fait orbiter la caméra autour d'un point central à une distance donnée
+         * Makes the camera orbit around a given point with a specified angle and axis.
+         * The camera will rotate around the point in the direction of the specified axis.
          *
-         * @param centre le point autour duquel orbiter
-         * @param angleDegres l'angle de rotation en degrés
-         * @param axe l'axe de rotation (généralement AXIS_Y pour rotation horizontale)
+         * @param centre the point to orbit around
+         * @param angleDegres the angle in degrees to rotate around the axis
+         * @param axe the axis of rotation (will be normalized)
          * @return this Builder object
          */
         public Builder orbitAround(Point centre, double angleDegres, Vector axe) {
@@ -699,14 +715,16 @@ public class Camera implements Cloneable {
             double angleRadians = Math.toRadians(angleDegres);
             axe = axe.normalize();
 
-            // Calculer le vecteur de la position actuelle vers le centre
-            Vector vecToCentre = centre.subtract(camera.location);
+            if (!centre.equals(camera.location))
+            {
+                // Calculer le vecteur de la position actuelle vers le centre
+                Vector vecToCentre = centre.subtract(camera.location);
 
-            // Faire tourner ce vecteur autour de l'axe
-            Vector vecToCentreRotated = rotateVector(vecToCentre, axe, angleRadians);
+                // Faire tourner ce vecteur autour de l'axe
+                 Vector vecToCentreRotated = rotateVector(vecToCentre, axe, angleRadians);
 
-            // Calculer la nouvelle position
-            camera.location = centre.subtract(vecToCentreRotated);
+                // Calculer la nouvelle position
+                camera.location = centre.subtract(vecToCentreRotated);
 
             // Optionnel : faire regarder la caméra vers le centre
             Vector direction = centre.subtract(camera.location);
@@ -718,6 +736,7 @@ public class Camera implements Cloneable {
             }
 
             hasTransformations = true;
+            }
             return this;
         }
 

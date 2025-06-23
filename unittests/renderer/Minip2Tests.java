@@ -68,7 +68,6 @@ public class Minip2Tests {
                 .setDirection(new Point(0, -100, -350), Vector.AXIS_Y)
                 .setVpDistance(300).setVpSize(600, 600)
                 .setResolution(800, 800)
-                .setMultithreading(-2)
                 .setNumOfRaysAA(9)
                 .setNumOfRaysDOF(30)
                 .setApertureWindow(20, 40)
@@ -96,5 +95,23 @@ public class Minip2Tests {
 
     }
 
+    @Test
+    void diamondSceneWithAperture() {
+
+        setUpDiamond(scene);
+        cameraBuilder
+                .setLocation(new Point(0, 50, 200))
+                .setDirection(new Point(0, -100, -350), Vector.AXIS_Y)
+                .setVpDistance(300).setVpSize(600, 600)
+                .setResolution(800, 800)
+                .setMultithreading(-2)
+                .setNumOfRaysDOF(30)
+                .setApertureWindow(20, 40)
+                .setDistanceFocalPlane(500)
+                .build()
+                .renderImage()
+                .writeToImage("diamond Aperture");
+
+    }
 
 }

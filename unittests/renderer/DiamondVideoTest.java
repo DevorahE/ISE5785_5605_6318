@@ -29,17 +29,18 @@ public class DiamondVideoTest {
         int totalFrames = 120;
 
         cameraBuilder
-                // Set initial camera position before orbiting
-                .setLocation(new Point(0, 50, 200))
-                .setDirection(new Point(0, -100, -350), Vector.AXIS_Y)
-                // Set viewport properties
-                .setVpDistance(300)
-                .setVpSize(600, 600)
+
+
+                .setVpDistance(300).setVpSize(600, 600)
                 .setResolution(800, 800)
+
+                // Set initial camera position before orbiting
                 .setMultithreading(-2);
 
         // Generate multiple images with camera orbiting around the scene
         for (int i = 0; i < totalFrames; i++) {
+            if(i == 30 || i == 60||i == 90)
+                continue;
             // Calculate orbit angle: complete 360° rotation over all frames
             // This creates smooth circular motion for video
             double orbitAngle = (360.0 / totalFrames) * i;
@@ -47,6 +48,8 @@ public class DiamondVideoTest {
             cameraBuilder
                     // Make camera orbit around scene center at calculated angle
                     // Using Y-axis for horizontal circular motion
+                    .setLocation(new Point(0, 50, 200))
+                    .setDirection(new Point(0, -100, -350), Vector.AXIS_Y)
                     .orbitAround(sceneCenter, orbitAngle, Vector.AXIS_Y)
 
                     // Build camera, render and save image
