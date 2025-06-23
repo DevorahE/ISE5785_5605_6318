@@ -51,7 +51,6 @@ class RenderTests {
                 .writeToImage("Two color render test");
     }
 
-    // For stage 6 - please disregard in stage 5
     /**
      * Produce a scene with basic 3D model - including individual lights of the
      * bodies and render it into a png image with a grid

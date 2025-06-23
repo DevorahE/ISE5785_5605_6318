@@ -672,14 +672,12 @@ public class Camera implements Cloneable {
             if (Math.abs(angleRadians) < 1e-8)
                 return v;
 
-            // Cas 2 : v est colinéaire à axis → rotation inutile ou inversion
             Vector cross;
             try {
                 cross = axis.crossProduct(v);
             } catch (IllegalArgumentException e) {
-                // Colinéaire → rotation de 180° = inversion si angle ≈ π
                 if (Math.abs(Math.abs(angleRadians) - Math.PI) < 1e-6)
-                    return v.scale(-1); // Inversion
+                    return v.scale(-1);
                 else
                     return v;
             }
@@ -704,38 +702,33 @@ public class Camera implements Cloneable {
          */
         public Builder orbitAround(Point centre, double angleDegres, Vector axe) {
             if (centre == null)
-                throw new IllegalArgumentException("ERREUR: Le centre d'orbite ne peut pas être null.");
+                throw new IllegalArgumentException("ERROR: Orbit center cannot be null.");
             if (axe == null)
-                throw new IllegalArgumentException("ERREUR: L'axe de rotation ne peut pas être null.");
+                throw new IllegalArgumentException("ERROR: Rotation axis cannot be null.");
             if (axe.lengthSquared() == 0)
-                throw new IllegalArgumentException("ERREUR: L'axe de rotation ne peut pas être un vecteur zéro.");
+                throw new IllegalArgumentException("ERROR: Rotation axis cannot be a zero vector.");
             if (camera.location == null)
-                throw new IllegalArgumentException("ERREUR: La position de la caméra doit être définie avant l'orbite.");
+                throw new IllegalArgumentException("ERROR: Camera position must be set before orbit.");
 
             double angleRadians = Math.toRadians(angleDegres);
             axe = axe.normalize();
 
             if (!centre.equals(camera.location))
             {
-                // Calculer le vecteur de la position actuelle vers le centre
                 Vector vecToCentre = centre.subtract(camera.location);
 
-                // Faire tourner ce vecteur autour de l'axe
                  Vector vecToCentreRotated = rotateVector(vecToCentre, axe, angleRadians);
 
-                // Calculer la nouvelle position
                 camera.location = centre.subtract(vecToCentreRotated);
 
-            // Optionnel : faire regarder la caméra vers le centre
-            Vector direction = centre.subtract(camera.location);
-            if (direction.lengthSquared() > 0) {
-                camera.vTo = direction.normalize();
-                // Recalculer vRight et vUp
-                camera.vRight = camera.vTo.crossProduct(Vector.AXIS_Y).normalize();
-                camera.vUp = camera.vRight.crossProduct(camera.vTo).normalize();
-            }
+                Vector direction = centre.subtract(camera.location);
+                if (direction.lengthSquared() > 0) {
+                    camera.vTo = direction.normalize();
+                    camera.vRight = camera.vTo.crossProduct(Vector.AXIS_Y).normalize();
+                    camera.vUp = camera.vRight.crossProduct(camera.vTo).normalize();
+                }
 
-            hasTransformations = true;
+                hasTransformations = true;
             }
             return this;
         }

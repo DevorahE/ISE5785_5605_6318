@@ -25,12 +25,9 @@ public class DiamondVideoTest {
         Point sceneCenter = new Point(0, -100, -350);
 
         // Number of frames for video (adjust based on desired video length and frame rate)
-        // For example: 60 frames = 2 seconds at 30fps, 120 frames = 4 seconds at 30fps
         int totalFrames = 120;
 
         cameraBuilder
-
-
                 .setVpDistance(300).setVpSize(600, 600)
                 .setResolution(800, 800)
 
@@ -39,8 +36,7 @@ public class DiamondVideoTest {
 
         // Generate multiple images with camera orbiting around the scene
         for (int i = 0; i < totalFrames; i++) {
-            if(i == 30 || i == 60||i == 90)
-                continue;
+
             // Calculate orbit angle: complete 360° rotation over all frames
             // This creates smooth circular motion for video
             double orbitAngle = (360.0 / totalFrames) * i;
@@ -59,7 +55,6 @@ public class DiamondVideoTest {
                     .writeToImage(String.format("Diamond_Video_Frame_%04d", i));
         }
 
-        System.out.println("Generated " + totalFrames + " frames for video creation");
     }
 
 

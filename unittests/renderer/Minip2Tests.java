@@ -99,6 +99,7 @@ public class Minip2Tests {
     void diamondSceneWithAperture() {
 
         setUpDiamond(scene);
+
         cameraBuilder
                 .setLocation(new Point(0, 50, 200))
                 .setDirection(new Point(0, -100, -350), Vector.AXIS_Y)
