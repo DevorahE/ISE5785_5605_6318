@@ -301,6 +301,14 @@ void bubbleTriangleImage_10Pictures() {
 
     // Define the center point of the scene (what the camera should orbit around)
     Point sceneCenter = new Point(0, 0, 0);
+    cameraBuilder
+            // Set initial camera position before orbiting
+            .setLocation(new Point(0, 200, 600))
+
+            // Set viewport properties
+            .setVpDistance(500)
+            .setVpSize(800, 800)
+            .setResolution(500, 500);
 
     // Generate 10 images with camera orbiting around the scene
     for (int i = 0; i < 10; i++) {
@@ -308,18 +316,11 @@ void bubbleTriangleImage_10Pictures() {
         // This creates a complete 360° rotation over 10 images (36° × 10 = 360°)
         double orbitAngle = 15 + i * 36;
 
-        cameraBuilder
-                // Set initial camera position before orbiting
-                .setLocation(new Point(0, 200, 600))
 
+            cameraBuilder
                 // Make camera orbit around scene center at calculated angle
                 // Using Y-axis for horizontal circular motion
                 .orbitAround(sceneCenter, orbitAngle, Vector.AXIS_Y)
-
-                // Set viewport properties
-                .setVpDistance(500)
-                .setVpSize(800, 800)
-                .setResolution(500, 500)
 
                 // Build camera, render and save image
                 .build()
