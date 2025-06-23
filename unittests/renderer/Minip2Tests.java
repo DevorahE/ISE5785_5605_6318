@@ -31,7 +31,7 @@ public class Minip2Tests {
      * The diamond is created with a more complex structure and improved materials.
      */
     void setUpDiamond(){
-
+    // === Diamond material ===
     Material diamondMaterial = new Material()
             .setKD(0.1).setKS(0.9).setShininess(300)
             .setKt(new Double3(0.75, 0.95, 0.98))
@@ -54,7 +54,7 @@ public class Minip2Tests {
 
     List<Triangle> triangles = new ArrayList<>();
 
-    // === CRÉATION DU DIAMANT (structure identique mais matériaux améliorés) ===
+    // === CREATION OF THE DIAMOND ===
     double angleStep = 2 * Math.PI / 24;
     double radiusMiddle = 100;
     double heightMiddle = 60;
@@ -65,12 +65,12 @@ public class Minip2Tests {
 
         Point p1Mid = new Point(
                 radiusMiddle * Math.cos(angle1),
-                heightMiddle - 50,  // Ajusté pour suivre le nouveau centre
+                heightMiddle - 50,  // Adjusted to follow the center
                 -270 + radiusMiddle * Math.sin(angle1) * 0.2
         );
         Point p2Mid = new Point(
                 radiusMiddle * Math.cos(angle2),
-                heightMiddle - 50,  // Ajusté pour suivre le nouveau centre
+                heightMiddle - 50,  // Adjusted to follow the center
                 -270 + radiusMiddle * Math.sin(angle2) * 0.2
         );
 
@@ -117,7 +117,7 @@ public class Minip2Tests {
         triangles.add(triangle2);
     }
 
-    // Pavillon du diamant - AJUSTÉ avec la nouvelle position
+    // Diamond Pavilion
     for (int i = 0; i < 24; i++) {
         double angle1 = i * angleStep;
         double angle2 = (i + 1) * angleStep;
@@ -138,7 +138,7 @@ public class Minip2Tests {
         triangles.add(triangle);
     }
 
-    // === PIÉDESTAL À 2 ÉTAGES EN VELOURS ROUGE ===
+    //=== 2-TIER RED VELVET PEDESTAL ===
     Material pedestalMaterial = new Material()
             .setKD(0.8).setKS(0.2).setShininess(30)
             .setKr(new Double3(0.05, 0.05, 0.05));
@@ -147,14 +147,14 @@ public class Minip2Tests {
             .setKD(0.7).setKS(0.3).setShininess(50)
             .setKr(new Double3(0.1, 0.1, 0.1));
 
-    // === ÉTAGE INFÉRIEUR (BASE) ===
+    //=== LOWER FLOOR (BASE) ===
     double pedestalBase1Height = -200;
     double pedestalBase1Radius = 250;
     double pedestalBase1Bottom = -280;
     int pedestalSides = 8;
     double pedestalAngleStep = 2 * Math.PI / pedestalSides;
 
-    // Dessus de l'étage inférieur
+    //Above the lower floor
     Point pedestalBase1Center = new Point(0, pedestalBase1Height, -290);
     for (int i = 0; i < pedestalSides; i++) {
         double angle1 = i * pedestalAngleStep;
@@ -177,7 +177,7 @@ public class Minip2Tests {
         triangles.add(pedestalTop);
     }
 
-    // Côtés de l'étage inférieur
+    // Sides of the lower floor
     for (int i = 0; i < pedestalSides; i++) {
         double angle1 = i * pedestalAngleStep;
         double angle2 = (i + 1) * pedestalAngleStep;
@@ -214,11 +214,11 @@ public class Minip2Tests {
         triangles.add(side2);
     }
 
-    // === ÉTAGE SUPÉRIEUR (PLUS PETIT) ===
+    // === UPPER FLOOR (SMALLER) ===
     double pedestalBase2Height = -180;
     double pedestalBase2Radius = 180;
 
-    // Dessus de l'étage supérieur
+    // Above the upper floor
     Point pedestalBase2Center = new Point(0, pedestalBase2Height, -290);
     for (int i = 0; i < pedestalSides; i++) {
         double angle1 = i * pedestalAngleStep;
@@ -237,11 +237,11 @@ public class Minip2Tests {
 
         Triangle pedestalTop = new Triangle(pedestalBase2Center, p1, p2);
         pedestalTop.setMaterial(pedestalTopMaterial)
-                .setEmission(new Color(85, 22, 22)); // Plus lumineux
+                .setEmission(new Color(85, 22, 22));
         triangles.add(pedestalTop);
     }
 
-    // Côtés de l'étage supérieur
+    // Sides of the upper floor
     for (int i = 0; i < pedestalSides; i++) {
         double angle1 = i * pedestalAngleStep;
         double angle2 = (i + 1) * pedestalAngleStep;
@@ -279,12 +279,12 @@ public class Minip2Tests {
     }
 
 
-    // === MURS DE LA SALLE (BEIGE LUXUEUX) ===
+    // === ROOM WALLS (BEIGE) ===
     Material wallMaterial = new Material()
             .setKD(0.7).setKS(0.3).setShininess(40)
             .setKr(new Double3(0.1, 0.1, 0.1));
 
-    // Mur arrière
+    // Back wall
     Triangle backgroundPlane1 = new Triangle(
             new Point(-1000, -400, -700),
             new Point(1000, -400, -700),
@@ -297,30 +297,30 @@ public class Minip2Tests {
     );
 
     backgroundPlane1.setMaterial(wallMaterial)
-            .setEmission(new Color(86, 74, 63)); // Beige chaud
+            .setEmission(new Color(86, 74, 63));
     backgroundPlane2.setMaterial(wallMaterial)
             .setEmission(new Color(86, 74, 63));
 
-    // Murs latéraux
+    //Side walls
     Triangle leftWall1 = new Triangle(
             new Point(-1000, -400, -700),
             new Point(-1000, 600, -700),
-            new Point(-1000, 600, 300)    // Étendu vers l'avant
+            new Point(-1000, 600, 300)    // Extended forward
     );
     Triangle leftWall2 = new Triangle(
             new Point(-1000, -400, -700),
-            new Point(-1000, 600, 300),   // Étendu vers l'avant
+            new Point(-1000, 600, 300),   // Extended forward
             new Point(-1000, -400, 300)
     );
 
     Triangle rightWall1 = new Triangle(
             new Point(1000, -400, -700),
-            new Point(1000, 600, 300),    // Étendu vers l'avant
+            new Point(1000, 600, 300),    // Extended forward
             new Point(1000, 600, -700)
     );
     Triangle rightWall2 = new Triangle(
             new Point(1000, -400, -700),
-            new Point(1000, -400, 300),   // Étendu vers l'avant
+            new Point(1000, -400, 300),   // Extended forward
             new Point(1000, 600, 300)
     );
 
@@ -329,45 +329,45 @@ public class Minip2Tests {
     rightWall1.setMaterial(wallMaterial).setEmission(new Color(86, 74, 63));
     rightWall2.setMaterial(wallMaterial).setEmission(new Color(86, 74, 63));
 
-    // === SOL EN MARBRE CLAIR ===
+    // === LIGHT MARBLE FLOOR ===
     Material marbleFloor = new Material()
             .setKD(0.4).setKS(0.6).setShininess(200)
             .setKr(new Double3(0.3, 0.3, 0.3));
 
     Triangle floor1 = new Triangle(
-            new Point(-1000, -280, 300),   // Étendu vers l'avant
+            new Point(-1000, -280, 300),   // Extended forward
             new Point(1000, -280, 300),
             new Point(1000, -280, -700)
     );
     Triangle floor2 = new Triangle(
-            new Point(-1000, -280, 300),   // Étendu vers l'avant
+            new Point(-1000, -280, 300),   // Extended forward
             new Point(1000, -280, -700),
             new Point(-1000, -280, -700)
     );
 
-    floor1.setMaterial(marbleFloor).setEmission(new Color(55, 50, 45)); // Marbre beige
+    floor1.setMaterial(marbleFloor).setEmission(new Color(55, 50, 45)); //Beige marble
     floor2.setMaterial(marbleFloor).setEmission(new Color(55, 50, 45));
 
-    // === PLAFOND ===
+    // === CEILING ===
     Material ceilingMaterial = new Material()
             .setKD(0.8).setKS(0.2).setShininess(20)
             .setKr(new Double3(0.05, 0.05, 0.05));
 
     Triangle ceiling1 = new Triangle(
             new Point(-1000, 600, -700),
-            new Point(1000, 600, 300),    // Étendu vers l'avant
+            new Point(1000, 600, 300),    // Extended forward
             new Point(1000, 600, -700)
     );
     Triangle ceiling2 = new Triangle(
             new Point(-1000, 600, -700),
-            new Point(-1000, 600, 300),   // Étendu vers l'avant
+            new Point(-1000, 600, 300),   // Extended forward
             new Point(1000, 600, 300)
     );
 
     ceiling1.setMaterial(ceilingMaterial).setEmission(new Color(50, 45, 40));
     ceiling2.setMaterial(ceilingMaterial).setEmission(new Color(50, 45, 40));
 
-    // Cercle décoratif doré autour du piédestal
+    // Decorative gold circle around the pedestal
     Material goldAccent = new Material()
             .setKD(0.2).setKS(0.8).setShininess(300)
             .setKr(new Double3(0.4, 0.4, 0.2));
@@ -405,40 +405,40 @@ public class Minip2Tests {
         Triangle ring1 = new Triangle(p1Inner, p1Outer, p2Inner);
         Triangle ring2 = new Triangle(p2Inner, p1Outer, p2Outer);
 
-        ring1.setMaterial(goldAccent).setEmission(new Color(80, 60, 20)); // Or
+        ring1.setMaterial(goldAccent).setEmission(new Color(80, 60, 20)); // Gold
         ring2.setMaterial(goldAccent).setEmission(new Color(80, 60, 20));
         triangles.add(ring1);
         triangles.add(ring2);
     }
 
-    // Ajout de tous les triangles à la scène
+    // Adding all triangles to the scene
     Triangle[] triangleArray = triangles.toArray(new Triangle[0]);
     scene.geometries.add(triangleArray);
     scene.geometries.add(backgroundPlane1, backgroundPlane2, floor1, floor2);
     scene.geometries.add(leftWall1, leftWall2, rightWall1, rightWall2);
     scene.geometries.add(ceiling1, ceiling2);
-    // === ÉCLAIRAGE OPTIMISÉ POUR DIAMANT ===
-    scene.setAmbientLight(new AmbientLight(new Color(8, 6, 4))); // Ambiance très réduite
+    // === DIAMOND-OPTIMIZED LIGHTING ===
+    scene.setAmbientLight(new AmbientLight(new Color(8, 6, 4)));
 
-    // Lumière principale - plus focalisée sur le diamant
+    // Main light - focused on the diamond
     scene.lights.add(new SpotLight(new Color(150, 140, 120), new Point(0, 400, -150), new Vector(0, -1, -0.2))
             .setKl(0.0001).setKq(0.000001));
 
-    //Éclairage latéral pour créer des reflets prismatiques
+    //Side lighting to create prismatic reflections
     scene.lights.add(new SpotLight(new Color(80, 90, 120), new Point(-300, 200, -100), new Vector(1, -0.8, -0.5))
             .setKl(0.0005).setKq(0.000005));
 
     scene.lights.add(new SpotLight(new Color(120, 80, 90), new Point(300, 200, -100), new Vector(-1, -0.8, -0.5))
             .setKl(0.0005).setKq(0.000005));
 
-    // Lumière d'accentuation depuis l'arrière pour la transparence
+    //Accent light from the back for transparency
     scene.lights.add(new SpotLight(new Color(60, 70, 90), new Point(0, 100, -500), new Vector(0, 0, 1))
             .setKl(0.001).setKq(0.00001));
 
-    // Éclairage directionnel très doux pour l'ambiance générale
+    // Very soft directional lighting for general ambiance
     scene.lights.add(new DirectionalLight(new Color(5, 4, 3), new Vector(0.3, -0.7, -1)));
 
-    // Lumières pour les murs (réduites)
+    // Lights for walls (reduced)
     scene.lights.add(new SpotLight(new Color(25, 20, 15), new Point(-600, 200, -300), new Vector(1, -0.2, 0))
             .setKl(0.005).setKq(0.00005));
 
@@ -446,7 +446,7 @@ public class Minip2Tests {
             .setKl(0.005).setKq(0.00005));
 
 
-    // Lumière spécifique pour le sommet
+    // Specific light for the summit
     scene.lights.add(new SpotLight(new Color(100, 110, 130), new Point(0, 300, -200), new Vector(0, -1, -0.3))
             .setKl(0.0003).setKq(0.000003));
 }

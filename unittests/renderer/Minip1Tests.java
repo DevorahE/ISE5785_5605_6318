@@ -149,7 +149,7 @@ public class Minip1Tests {
                 .setKr(new Double3(0.05, 0.05, 0.08));
 
         backgroundPlane1
-                .setEmission(new Color(5, 8, 15))  // Émission très réduite
+                .setEmission(new Color(5, 8, 15))
                 .setMaterial(backgroundMaterial);
         backgroundPlane2
                 .setEmission(new Color(5, 8, 15))
@@ -181,7 +181,7 @@ public class Minip1Tests {
         scene.geometries.add(triangleArray);
         scene.geometries.add(backgroundPlane1, backgroundPlane2, floor1, floor2);
 
-        scene.setAmbientLight(new AmbientLight(new Color(3, 5, 8)));  // Ambiance très douce
+        scene.setAmbientLight(new AmbientLight(new Color(3, 5, 8)));
 
         scene.lights.add(new SpotLight(new Color(255, 255, 255), new Point(0, 300, 200), new Vector(0, -1, -1))
                 .setKl(0.0001).setKq(0.000001));
