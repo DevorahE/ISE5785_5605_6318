@@ -35,7 +35,8 @@ public class DiamondVideoTest {
                 // Set viewport properties
                 .setVpDistance(300)
                 .setVpSize(600, 600)
-                .setResolution(800, 800);
+                .setResolution(800, 800)
+                .setMultithreading(-2);
 
         // Generate multiple images with camera orbiting around the scene
         for (int i = 0; i < totalFrames; i++) {

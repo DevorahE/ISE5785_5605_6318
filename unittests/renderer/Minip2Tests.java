@@ -32,7 +32,7 @@ public class Minip2Tests {
                 .setNumOfRaysAA(9)
                 .setNumOfRaysDOF(30)
                 .setApertureWindow(20, 40)
-                .setDistanceFocalPlane(390)
+                .setDistanceFocalPlane(500)
                 .setMultithreading(-2)
                 .setAdaptiveSuperSampling(2)
                 .build()
@@ -72,7 +72,7 @@ public class Minip2Tests {
                 .setNumOfRaysAA(9)
                 .setNumOfRaysDOF(30)
                 .setApertureWindow(20, 40)
-                .setDistanceFocalPlane(390)
+                .setDistanceFocalPlane(500)
                 .build()
                 .renderImage()
                 .writeToImage("diamond WithEffects WithoutAcceleration");
